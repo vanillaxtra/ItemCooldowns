@@ -1,7 +1,9 @@
 package net.mattwhyy.itemcooldowns.features.gui;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.mattwhyy.itemcooldowns.ItemCooldownsPlugin;
 import net.mattwhyy.itemcooldowns.Messages;
@@ -11,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -29,11 +32,15 @@ public final class RuleEditorMenu implements MenuHolder {
     private static final int SAVE = 40;
     private static final int DELETE = 44;
     private static final int MAX_SECONDS = 3600;
+    private static final int[] TOGGLES = GuiItems.rowsOf(7, 2, 3);
 
     private final ItemCooldownsPlugin plugin;
     private final Player viewer;
     private final Inventory inventory;
     private final int ruleIndex;
+    private final CooldownRule.Group group;
+    private final List<String> options;
+    private final Set<String> enabled;
     private ItemStack template;
     private int leftSeconds;
     private int rightSeconds;
@@ -43,27 +50,30 @@ public final class RuleEditorMenu implements MenuHolder {
     private int generation;
     private boolean silent;
 
-    private RuleEditorMenu(
-            ItemCooldownsPlugin plugin,
-            Player viewer,
-            int ruleIndex,
-            ItemStack template,
-            int leftSeconds,
-            int rightSeconds,
-            boolean matchPotion,
-            boolean matchCmd,
-            boolean matchModel) {
+    private RuleEditorMenu(ItemCooldownsPlugin plugin, Player viewer, int ruleIndex, CooldownRule rule) {
         this.plugin = plugin;
         this.viewer = viewer;
         this.ruleIndex = ruleIndex;
-        this.template = GuiItems.asTemplate(plugin, template);
-        this.leftSeconds = leftSeconds;
-        this.rightSeconds = rightSeconds;
-        this.matchPotion = matchPotion;
-        this.matchCmd = matchCmd;
-        this.matchModel = matchModel;
+        this.group = rule == null ? CooldownRule.Group.NONE : rule.group();
+        this.options = group == CooldownRule.Group.NONE ? List.of() : CooldownRule.groupKeys(group);
+        this.enabled = new LinkedHashSet<>(rule == null || !rule.grouped() ? options : rule.enabled());
+        this.template = rule == null ? null : GuiItems.asTemplate(plugin, rule.icon());
+        this.leftSeconds = rule == null ? 0 : rule.leftSeconds();
+        this.rightSeconds = rule == null ? 0 : rule.rightSeconds();
+        this.matchPotion = rule != null && rule.potion() != null;
+        this.matchCmd = rule != null && rule.cmd() != null;
+        this.matchModel = rule != null && rule.itemModel() != null;
         this.inventory = Bukkit.createInventory(this, SIZE, Messages.text(Messages.TITLE_EDITOR));
         paint();
+    }
+
+    public static void open(ItemCooldownsPlugin plugin, Player player, int ruleIndex, CooldownRule rule, boolean sound) {
+        RuleListMenu.markCurrentSilent(player);
+        RuleEditorMenu menu = new RuleEditorMenu(plugin, player, ruleIndex, rule);
+        player.openInventory(menu.inventory);
+        if (sound) {
+            MenuSounds.open(player);
+        }
     }
 
     public static void open(
@@ -77,21 +87,24 @@ public final class RuleEditorMenu implements MenuHolder {
             boolean matchCmd,
             boolean matchModel,
             boolean sound) {
-        RuleListMenu.markCurrentSilent(player);
-        RuleEditorMenu menu = new RuleEditorMenu(
-                plugin, player, ruleIndex, template, leftSeconds, rightSeconds, matchPotion, matchCmd, matchModel);
-        player.openInventory(menu.inventory);
-        if (sound) {
-            MenuSounds.open(player);
+        CooldownRule rule = CooldownRule.fromItem(template, matchPotion, matchCmd, matchModel, leftSeconds, rightSeconds);
+        if (rule == null && template == null) {
+            open(plugin, player, ruleIndex, null, sound);
+            return;
         }
+        if (rule == null) {
+            rule = new CooldownRule(null, template.getType(), null, null, null, leftSeconds, rightSeconds);
+        }
+        open(plugin, player, ruleIndex, rule, sound);
     }
 
     private void paint() {
-        ItemStack filler = GuiItems.filler(plugin);
-        for (int slot = 0; slot < SIZE; slot++) {
-            inventory.setItem(slot, filler.clone());
-        }
-        inventory.setItem(BOOK, GuiItems.button(plugin, Material.BOOK, Messages.EDITOR_BOOK, Messages.EDITOR_LORE));
+        GuiItems.fill(inventory, GuiItems.filler(plugin));
+        inventory.setItem(BOOK, GuiItems.button(
+                plugin,
+                Material.BOOK,
+                Messages.EDITOR_BOOK,
+                grouped() ? Messages.EDITOR_GROUP_LORE : Messages.EDITOR_LORE));
         inventory.setItem(BACK, GuiItems.button(plugin, Material.ARROW, Messages.BACK));
         if (ruleIndex >= 0) {
             inventory.setItem(DELETE, GuiItems.button(plugin, Material.BARRIER, Messages.DELETE));
@@ -104,9 +117,32 @@ public final class RuleEditorMenu implements MenuHolder {
         inventory.setItem(RIGHT, showRight() ? sideButton(Material.ENDER_PEARL, Messages.RIGHT, rightSeconds) : GuiItems.filler(plugin));
         inventory.setItem(ITEM, itemButton());
         inventory.setItem(SAVE, GuiItems.button(plugin, Material.EMERALD, canSave(), Messages.SAVE));
+        if (grouped()) {
+            paintToggles();
+            return;
+        }
         paintMatch(POTION, hasPotion(), matchPotion, Material.POTION, Messages.MATCH_POTION_ON, Messages.MATCH_POTION_OFF);
         paintMatch(CMD, hasCmd(), matchCmd, Material.ITEM_FRAME, Messages.MATCH_CMD_ON, Messages.MATCH_CMD_OFF);
         paintMatch(MODEL, hasModel(), matchModel, Material.GLOW_ITEM_FRAME, Messages.MATCH_MODEL_ON, Messages.MATCH_MODEL_OFF);
+    }
+
+    private void paintToggles() {
+        for (int i = 0; i < TOGGLES.length; i++) {
+            if (i >= options.size()) {
+                inventory.setItem(TOGGLES[i], GuiItems.filler(plugin));
+                continue;
+            }
+            String key = options.get(i);
+            ItemStack icon = CooldownRule.optionIcon(key);
+            if (icon == null) {
+                inventory.setItem(TOGGLES[i], GuiItems.filler(plugin));
+                continue;
+            }
+            boolean on = enabled.contains(key);
+            List<Component> lore = new ArrayList<>();
+            lore.add(Messages.text(on ? Messages.SECONDS_ON : Messages.SECONDS_OFF, "seconds", String.valueOf(Math.max(leftSeconds, rightSeconds))));
+            inventory.setItem(TOGGLES[i], GuiItems.named(plugin, icon, GuiItems.shownName(viewer, icon), lore, on));
+        }
     }
 
     private ItemStack sideButton(Material material, String nameKey, int seconds) {
@@ -121,8 +157,18 @@ public final class RuleEditorMenu implements MenuHolder {
             return GuiItems.button(plugin, Material.LIGHT_GRAY_STAINED_GLASS_PANE, Messages.ITEM_SLOT, Messages.ITEM_SLOT_EMPTY);
         }
         List<Component> lore = new ArrayList<>();
-        lore.add(Messages.text(Messages.ITEM_SLOT));
-        return GuiItems.named(plugin, template, GuiItems.shownName(viewer, template), lore, false);
+        lore.add(Messages.text(grouped() ? Messages.GROUP_SELECT_ALL : Messages.ITEM_SLOT));
+        Component name = grouped() ? Messages.text(groupNameKey()) : GuiItems.shownName(viewer, template);
+        return GuiItems.named(plugin, template, name, lore, grouped());
+    }
+
+    private String groupNameKey() {
+        return switch (group) {
+            case SPEAR -> Messages.PRESET_SPEAR;
+            case TURTLE_MASTER -> Messages.PRESET_TURTLE;
+            case INSTANT_HEALTH -> Messages.PRESET_HEALING;
+            case NONE -> Messages.ITEM_SLOT;
+        };
     }
 
     private void paintMatch(int slot, boolean available, boolean on, Material material, String onKey, String offKey) {
@@ -148,8 +194,18 @@ public final class RuleEditorMenu implements MenuHolder {
         return print != null && print.itemModel() != null;
     }
 
+    private boolean grouped() {
+        return group != CooldownRule.Group.NONE;
+    }
+
     private boolean canSave() {
-        return template != null && (leftSeconds > 0 || rightSeconds > 0);
+        if (leftSeconds <= 0 && rightSeconds <= 0) {
+            return false;
+        }
+        if (grouped()) {
+            return !enabled.isEmpty();
+        }
+        return template != null;
     }
 
     @Override
@@ -161,7 +217,11 @@ public final class RuleEditorMenu implements MenuHolder {
     public void onClick(Player player, InventoryClickEvent event) {
         int raw = event.getRawSlot();
         if (raw >= SIZE) {
-            takeFromBottom(player, event);
+            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && !grouped()) {
+                takeFromBottom(player, event);
+                return;
+            }
+            MenuHolder.freePlayerInv(event);
             return;
         }
         if (raw == BACK) {
@@ -188,6 +248,20 @@ public final class RuleEditorMenu implements MenuHolder {
             MenuSounds.click(player);
             return;
         }
+        if (grouped()) {
+            if (raw == ITEM) {
+                enabled.clear();
+                enabled.addAll(options);
+                refresh();
+                MenuSounds.toggleOn(player);
+                return;
+            }
+            int option = GuiItems.indexOf(TOGGLES, raw);
+            if (option >= 0 && option < options.size()) {
+                toggleOption(player, options.get(option));
+            }
+            return;
+        }
         if (raw == POTION && hasPotion()) {
             matchPotion = !matchPotion;
             refresh();
@@ -207,30 +281,70 @@ public final class RuleEditorMenu implements MenuHolder {
             return;
         }
         if (raw == ITEM) {
-            if (event.getClick() == ClickType.RIGHT && template != null) {
-                template = null;
-                matchPotion = true;
-                matchCmd = true;
-                matchModel = true;
-                refresh();
-                MenuSounds.clear(player);
-                return;
-            }
-            ItemStack incoming = GuiItems.asTemplate(plugin, player.getItemOnCursor());
-            if (incoming != null) {
-                accept(incoming);
-                refresh();
-                MenuSounds.place(player);
-            }
+            swapItem(player);
         }
     }
 
-    private void takeFromBottom(Player player, InventoryClickEvent event) {
-        ItemStack clicked = GuiItems.asTemplate(plugin, event.getCurrentItem());
-        if (clicked == null) {
+    private void toggleOption(Player player, String key) {
+        if (enabled.contains(key)) {
+            enabled.remove(key);
+            refresh();
+            MenuSounds.toggleOff(player);
             return;
         }
-        accept(clicked);
+        enabled.addAll(options);
+        refresh();
+        MenuSounds.toggleOn(player);
+    }
+
+    private void swapItem(Player player) {
+        ItemStack cursor = player.getItemOnCursor();
+        ItemStack incoming = GuiItems.asTemplate(plugin, cursor);
+        ItemStack outgoing = template;
+        if (incoming == null && outgoing == null) {
+            return;
+        }
+        if (incoming != null && outgoing != null && cursor.getAmount() > 1) {
+            MenuSounds.deny(player);
+            return;
+        }
+        template = incoming;
+        if (incoming == null) {
+            player.setItemOnCursor(outgoing.clone());
+            matchPotion = true;
+            matchCmd = true;
+            matchModel = true;
+            MenuSounds.clear(player);
+        } else {
+            if (cursor.getAmount() <= 1) {
+                player.setItemOnCursor(outgoing == null ? new ItemStack(Material.AIR) : outgoing.clone());
+            } else {
+                cursor.setAmount(cursor.getAmount() - 1);
+                player.setItemOnCursor(cursor);
+            }
+            accept(template);
+            MenuSounds.place(player);
+        }
+        refresh();
+    }
+
+    private void takeFromBottom(Player player, InventoryClickEvent event) {
+        ItemStack clicked = event.getCurrentItem();
+        ItemStack incoming = GuiItems.asTemplate(plugin, clicked);
+        if (incoming == null) {
+            return;
+        }
+        if (template != null && clicked.getAmount() > 1) {
+            MenuSounds.deny(player);
+            return;
+        }
+        if (clicked.getAmount() <= 1) {
+            event.setCurrentItem(template == null ? null : template.clone());
+        } else {
+            clicked.setAmount(clicked.getAmount() - 1);
+            event.setCurrentItem(clicked);
+        }
+        accept(incoming);
         refresh();
         MenuSounds.place(player);
     }
@@ -260,10 +374,16 @@ public final class RuleEditorMenu implements MenuHolder {
     }
 
     private boolean showLeft() {
+        if (grouped()) {
+            return group == CooldownRule.Group.SPEAR;
+        }
         return template == null || CooldownRule.showLeft(template.getType());
     }
 
     private boolean showRight() {
+        if (grouped()) {
+            return true;
+        }
         return template == null || CooldownRule.showRight(template.getType());
     }
 
@@ -279,7 +399,7 @@ public final class RuleEditorMenu implements MenuHolder {
     }
 
     private void trySave(Player player) {
-        if (template == null) {
+        if (!grouped() && template == null) {
             MenuSounds.deny(player);
             Messages.actionBar(player, Messages.NEED_ITEM);
             return;
@@ -289,19 +409,18 @@ public final class RuleEditorMenu implements MenuHolder {
             Messages.actionBar(player, Messages.NEED_TIME);
             return;
         }
-        CooldownRule rule = CooldownRule.fromItem(
-                template,
-                matchPotion && hasPotion(),
-                matchCmd && hasCmd(),
-                matchModel && hasModel(),
-                leftSeconds,
-                rightSeconds);
+        if (grouped() && enabled.isEmpty()) {
+            MenuSounds.deny(player);
+            Messages.actionBar(player, Messages.NEED_ONE_TYPE);
+            return;
+        }
+        CooldownRule rule = buildRule();
         if (rule == null) {
             MenuSounds.deny(player);
             Messages.actionBar(player, Messages.NEED_ITEM);
             return;
         }
-        int existing = plugin.rules().indexOfFilter(rule.filter());
+        int existing = plugin.rules().indexOf(rule);
         if (existing >= 0 && existing != ruleIndex) {
             MenuSounds.deny(player);
             Messages.actionBar(player, Messages.DUPLICATE);
@@ -324,6 +443,28 @@ public final class RuleEditorMenu implements MenuHolder {
         });
     }
 
+    private CooldownRule buildRule() {
+        if (grouped()) {
+            return new CooldownRule(
+                    null,
+                    template == null ? Material.BARRIER : template.getType(),
+                    template == null ? null : ItemFingerprint.of(template) == null ? null : ItemFingerprint.of(template).potion(),
+                    null,
+                    null,
+                    leftSeconds,
+                    rightSeconds,
+                    group,
+                    enabled);
+        }
+        return CooldownRule.fromItem(
+                template,
+                matchPotion && hasPotion(),
+                matchCmd && hasCmd(),
+                matchModel && hasModel(),
+                leftSeconds,
+                rightSeconds);
+    }
+
     private static CooldownRule keepId(CooldownRule old, CooldownRule next) {
         return new CooldownRule(
                 old.id(),
@@ -332,7 +473,9 @@ public final class RuleEditorMenu implements MenuHolder {
                 next.cmd(),
                 next.itemModel(),
                 next.leftSeconds(),
-                next.rightSeconds());
+                next.rightSeconds(),
+                next.group(),
+                next.enabled());
     }
 
     private void later(Player player, Runnable action) {
@@ -369,6 +512,7 @@ public final class RuleEditorMenu implements MenuHolder {
 
     @Override
     public void onDrag(Player player, InventoryDragEvent event) {
+        MenuHolder.freePlayerDrag(event);
     }
 
     @Override

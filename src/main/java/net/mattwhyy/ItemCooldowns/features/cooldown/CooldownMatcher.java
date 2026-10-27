@@ -41,6 +41,20 @@ public final class CooldownMatcher {
         return score;
     }
 
+    public static int scoreAny(List<Filter> options, Probe item) {
+        int best = -1;
+        if (options == null) {
+            return -1;
+        }
+        for (Filter option : options) {
+            int scored = score(option, item);
+            if (scored > best) {
+                best = scored;
+            }
+        }
+        return best;
+    }
+
     public static int bestIndex(List<Filter> rules, Probe item) {
         int best = -1;
         int bestScore = -1;
@@ -103,5 +117,9 @@ public final class CooldownMatcher {
         assert sameFilter(cmdMace, new Filter("MACE", null, 12, null));
         assert !sameFilter(cmdMace, allMaces);
         assert !sameFilter(cmdMace, otherCmd);
+        List<Filter> spears = List.of(new Filter("WOODEN_SPEAR", null, null, null), new Filter("IRON_SPEAR", null, null, null));
+        assert scoreAny(spears, new Probe("IRON_SPEAR", null, null, null)) == 1;
+        assert scoreAny(spears, vanillaMace) == -1;
+        assert scoreAny(List.of(), vanillaMace) == -1;
     }
 }

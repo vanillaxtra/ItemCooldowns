@@ -1,7 +1,9 @@
 package net.mattwhyy.itemcooldowns.features.cooldown;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import net.mattwhyy.itemcooldowns.ItemCooldownsPlugin;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,7 +14,7 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 
 public final class CooldownRepository {
-    public static final int SCHEMA = 2;
+    public static final int SCHEMA = 3;
     private static final long SAVE_DELAY = 40L;
 
     private final ItemCooldownsPlugin plugin;
@@ -39,17 +41,35 @@ public final class CooldownRepository {
         if (print == null) {
             return null;
         }
-        List<CooldownMatcher.Filter> filters = new ArrayList<>(rules.size());
+        CooldownMatcher.Probe probe = print.probe();
+        CooldownRule best = null;
+        int bestScore = -1;
         for (CooldownRule rule : rules) {
-            filters.add(rule.filter());
+            int scored = rule.score(probe);
+            if (scored > bestScore) {
+                bestScore = scored;
+                best = rule;
+            }
         }
-        int index = CooldownMatcher.bestIndex(filters, print.probe());
-        return index < 0 ? null : rules.get(index);
+        return best;
+    }
+
+    public int indexOf(CooldownRule rule) {
+        for (int i = 0; i < rules.size(); i++) {
+            if (rules.get(i).sameIdentity(rule)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public int indexOfFilter(CooldownMatcher.Filter filter) {
         for (int i = 0; i < rules.size(); i++) {
-            if (CooldownMatcher.sameFilter(rules.get(i).filter(), filter)) {
+            CooldownRule rule = rules.get(i);
+            if (rule.grouped()) {
+                continue;
+            }
+            if (CooldownMatcher.sameFilter(rule.filter(), filter)) {
                 return i;
             }
         }
@@ -74,6 +94,33 @@ public final class CooldownRepository {
             scheduleSave();
         }
         return added;
+    }
+
+    public boolean enabled(ItemStack stack) {
+        CooldownRule rule = CooldownRule.fromItem(stack, true, false, false, 0, 0);
+        return rule != null && indexOf(rule) >= 0;
+    }
+
+    public boolean enabled(CooldownRule rule) {
+        return indexOf(rule) >= 0;
+    }
+
+    public boolean toggle(CooldownRule rule) {
+        int existing = indexOf(rule);
+        if (existing >= 0) {
+            delete(existing);
+            return false;
+        }
+        add(rule);
+        return true;
+    }
+
+    public boolean toggle(ItemStack stack, int left, int right) {
+        CooldownRule rule = CooldownRule.fromItem(stack, true, false, false, left, right);
+        if (rule == null) {
+            return false;
+        }
+        return toggle(rule);
     }
 
     public void replace(int index, CooldownRule rule) {
@@ -121,6 +168,11 @@ public final class CooldownRepository {
             PotionType potion = ItemFingerprint.potionOf(entry.getString("potion"));
             Integer cmd = entry.contains("custom-model-data") ? entry.getInt("custom-model-data") : null;
             NamespacedKey model = ItemFingerprint.modelOf(entry.getString("item-model"));
+            CooldownRule.Group group = CooldownRule.groupOf(entry.getString("group"));
+            Set<String> enabled = new LinkedHashSet<>(entry.getStringList("enabled"));
+            if (group != CooldownRule.Group.NONE && enabled.isEmpty()) {
+                enabled.addAll(CooldownRule.groupKeys(group));
+            }
             rules.add(new CooldownRule(
                     entry.getString("id"),
                     material,
@@ -128,7 +180,9 @@ public final class CooldownRepository {
                     cmd,
                     model,
                     entry.getInt("left"),
-                    entry.getInt("right")));
+                    entry.getInt("right"),
+                    group,
+                    enabled));
         }
         return true;
     }
@@ -152,6 +206,8 @@ public final class CooldownRepository {
             config.set(path + ".item-model", rule.itemModel() == null ? null : rule.itemModel().asString());
             config.set(path + ".left", rule.leftSeconds());
             config.set(path + ".right", rule.rightSeconds());
+            config.set(path + ".group", rule.grouped() ? rule.group().name() : null);
+            config.set(path + ".enabled", rule.grouped() ? List.copyOf(rule.enabled()) : null);
         }
         plugin.saveConfig();
     }

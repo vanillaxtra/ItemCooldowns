@@ -56,23 +56,17 @@ public final class ConfirmDeleteMenu implements MenuHolder {
     @Override
     public void onClick(Player player, InventoryClickEvent event) {
         int raw = event.getRawSlot();
+        if (raw >= inventory.getSize()) {
+            MenuHolder.freePlayerInv(event);
+            return;
+        }
         if (raw == CANCEL) {
             CooldownRule rule = plugin.rules().get(ruleIndex);
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if (!stillOpen(player) || rule == null) {
                     return;
                 }
-                RuleEditorMenu.open(
-                        plugin,
-                        player,
-                        ruleIndex,
-                        rule.icon(),
-                        rule.leftSeconds(),
-                        rule.rightSeconds(),
-                        rule.potion() != null,
-                        rule.cmd() != null,
-                        rule.itemModel() != null,
-                        true);
+                RuleEditorMenu.open(plugin, player, ruleIndex, rule, true);
             });
             return;
         }
@@ -107,6 +101,7 @@ public final class ConfirmDeleteMenu implements MenuHolder {
 
     @Override
     public void onDrag(Player player, InventoryDragEvent event) {
+        MenuHolder.freePlayerDrag(event);
     }
 
     @Override

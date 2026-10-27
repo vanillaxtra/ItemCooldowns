@@ -28,7 +28,7 @@ public final class MenuSounds {
     }
 
     public static void delete(Player player) {
-        play(player, Sound.ENTITY_ITEM_BREAK);
+        play(player, Sound.BLOCK_ANVIL_DESTROY);
     }
 
     public static void confirm(Player player) {

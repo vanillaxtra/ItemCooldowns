@@ -1,7 +1,12 @@
 package net.mattwhyy.itemcooldowns.features.cooldown;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+import net.mattwhyy.itemcooldowns.Messages;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +16,26 @@ import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.potion.PotionType;
 
 public final class CooldownRule {
+    public enum Group {
+        NONE,
+        SPEAR,
+        TURTLE_MASTER,
+        INSTANT_HEALTH
+    }
+
+    private static final List<String> SPEAR_KEYS = List.of(
+            "WOODEN_SPEAR",
+            "STONE_SPEAR",
+            "COPPER_SPEAR",
+            "IRON_SPEAR",
+            "GOLDEN_SPEAR",
+            "DIAMOND_SPEAR",
+            "NETHERITE_SPEAR");
+    private static final List<Material> BOTTLES = List.of(
+            Material.POTION,
+            Material.SPLASH_POTION,
+            Material.LINGERING_POTION);
+
     private final String id;
     private final Material material;
     private final PotionType potion;
@@ -18,6 +43,8 @@ public final class CooldownRule {
     private final NamespacedKey itemModel;
     private final int leftSeconds;
     private final int rightSeconds;
+    private final Group group;
+    private final Set<String> enabled;
 
     public CooldownRule(
             String id,
@@ -27,6 +54,19 @@ public final class CooldownRule {
             NamespacedKey itemModel,
             int leftSeconds,
             int rightSeconds) {
+        this(id, material, potion, cmd, itemModel, leftSeconds, rightSeconds, Group.NONE, Set.of());
+    }
+
+    public CooldownRule(
+            String id,
+            Material material,
+            PotionType potion,
+            Integer cmd,
+            NamespacedKey itemModel,
+            int leftSeconds,
+            int rightSeconds,
+            Group group,
+            Set<String> enabled) {
         this.id = id == null || id.isBlank() ? UUID.randomUUID().toString() : id;
         this.material = material;
         this.potion = potion;
@@ -34,6 +74,8 @@ public final class CooldownRule {
         this.itemModel = itemModel;
         this.leftSeconds = Math.max(0, leftSeconds);
         this.rightSeconds = Math.max(0, rightSeconds);
+        this.group = group == null ? Group.NONE : group;
+        this.enabled = this.group == Group.NONE ? Set.of() : Set.copyOf(enabled);
     }
 
     public static CooldownRule fromItem(
@@ -55,6 +97,19 @@ public final class CooldownRule {
                 matchModel ? print.itemModel() : null,
                 leftSeconds,
                 rightSeconds);
+    }
+
+    public static CooldownRule group(Group group, int leftSeconds, int rightSeconds) {
+        return new CooldownRule(
+                null,
+                groupIcon(group),
+                groupPotion(group),
+                null,
+                null,
+                leftSeconds,
+                rightSeconds,
+                group,
+                new LinkedHashSet<>(groupKeys(group)));
     }
 
     public String id() {
@@ -85,12 +140,24 @@ public final class CooldownRule {
         return rightSeconds;
     }
 
+    public Group group() {
+        return group;
+    }
+
+    public Set<String> enabled() {
+        return enabled;
+    }
+
     public int seconds(ClickSide side) {
         return side == ClickSide.LEFT ? leftSeconds : rightSeconds;
     }
 
+    public boolean grouped() {
+        return group != Group.NONE;
+    }
+
     public boolean specific() {
-        return potion != null || cmd != null || itemModel != null;
+        return grouped() || potion != null || cmd != null || itemModel != null;
     }
 
     public CooldownMatcher.Filter filter() {
@@ -99,6 +166,52 @@ public final class CooldownRule {
                 potion == null ? null : potion.name(),
                 cmd,
                 itemModel == null ? null : itemModel.asString());
+    }
+
+    public List<CooldownMatcher.Filter> options() {
+        if (!grouped()) {
+            return List.of(filter());
+        }
+        List<CooldownMatcher.Filter> options = new ArrayList<>();
+        for (String key : enabled) {
+            options.add(parseKey(key));
+        }
+        return options;
+    }
+
+    public int score(CooldownMatcher.Probe probe) {
+        return CooldownMatcher.scoreAny(options(), probe);
+    }
+
+    public boolean sameIdentity(CooldownRule other) {
+        if (other == null) {
+            return false;
+        }
+        if (grouped() || other.grouped()) {
+            return group == other.group;
+        }
+        return CooldownMatcher.sameFilter(filter(), other.filter());
+    }
+
+    public String groupNameKey() {
+        return switch (group) {
+            case SPEAR -> Messages.PRESET_SPEAR;
+            case TURTLE_MASTER -> Messages.PRESET_TURTLE;
+            case INSTANT_HEALTH -> Messages.PRESET_HEALING;
+            case NONE -> null;
+        };
+    }
+
+    public static List<String> groupKeys(Group group) {
+        return switch (group) {
+            case SPEAR -> availableSpears();
+            case TURTLE_MASTER -> potionKeys(
+                    PotionType.TURTLE_MASTER,
+                    PotionType.LONG_TURTLE_MASTER,
+                    PotionType.STRONG_TURTLE_MASTER);
+            case INSTANT_HEALTH -> potionKeys(PotionType.HEALING, PotionType.STRONG_HEALING);
+            case NONE -> List.of();
+        };
     }
 
     public ItemStack icon() {
@@ -110,7 +223,7 @@ public final class CooldownRule {
         }
         if (meta != null && cmd != null) {
             CustomModelDataComponent component = meta.getCustomModelDataComponent();
-            component.setFloats(java.util.List.of(cmd.floatValue()));
+            component.setFloats(List.of(cmd.floatValue()));
             meta.setCustomModelDataComponent(component);
         }
         if (meta != null && itemModel != null) {
@@ -120,6 +233,29 @@ public final class CooldownRule {
             stack.setItemMeta(meta);
         }
         return stack;
+    }
+
+    public static ItemStack optionIcon(String key) {
+        CooldownMatcher.Filter filter = parseKey(key);
+        Material material = materialOf(filter.material());
+        if (material == null) {
+            return null;
+        }
+        ItemStack stack = new ItemStack(material);
+        PotionType type = ItemFingerprint.potionOf(filter.potion());
+        if (type != null && stack.getItemMeta() instanceof PotionMeta meta) {
+            meta.setBasePotionType(type);
+            stack.setItemMeta(meta);
+        }
+        return stack;
+    }
+
+    public static CooldownMatcher.Filter parseKey(String key) {
+        int split = key.indexOf(':');
+        if (split < 0) {
+            return new CooldownMatcher.Filter(key, null, null, null);
+        }
+        return new CooldownMatcher.Filter(key.substring(0, split), key.substring(split + 1), null, null);
     }
 
     public static boolean meleeDefault(Material material) {
@@ -170,5 +306,62 @@ public final class CooldownRule {
             return null;
         }
         return Material.matchMaterial(name.toUpperCase(Locale.ROOT));
+    }
+
+    public static Group groupOf(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return Group.NONE;
+        }
+        try {
+            return Group.valueOf(raw.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return Group.NONE;
+        }
+    }
+
+    private static Material groupIcon(Group group) {
+        return switch (group) {
+            case SPEAR -> firstSpear();
+            case TURTLE_MASTER, INSTANT_HEALTH -> Material.POTION;
+            case NONE -> Material.BARRIER;
+        };
+    }
+
+    private static PotionType groupPotion(Group group) {
+        return switch (group) {
+            case TURTLE_MASTER -> PotionType.TURTLE_MASTER;
+            case INSTANT_HEALTH -> PotionType.STRONG_HEALING;
+            default -> null;
+        };
+    }
+
+    private static Material firstSpear() {
+        for (String key : SPEAR_KEYS) {
+            Material material = materialOf(key);
+            if (material != null) {
+                return material;
+            }
+        }
+        return Material.TRIDENT;
+    }
+
+    private static List<String> availableSpears() {
+        List<String> keys = new ArrayList<>();
+        for (String key : SPEAR_KEYS) {
+            if (materialOf(key) != null) {
+                keys.add(key);
+            }
+        }
+        return keys;
+    }
+
+    private static List<String> potionKeys(PotionType... types) {
+        List<String> keys = new ArrayList<>();
+        for (PotionType type : types) {
+            for (Material bottle : BOTTLES) {
+                keys.add(bottle.name() + ":" + type.name());
+            }
+        }
+        return keys;
     }
 }

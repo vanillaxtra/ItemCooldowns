@@ -100,7 +100,11 @@ public final class RuleListMenu implements MenuHolder {
     @Override
     public void onClick(Player player, InventoryClickEvent event) {
         int raw = event.getRawSlot();
-        if (raw < 0 || raw >= SIZE) {
+        if (raw >= SIZE) {
+            MenuHolder.freePlayerInv(event);
+            return;
+        }
+        if (raw < 0) {
             return;
         }
         if (raw == PRESETS) {
@@ -129,24 +133,17 @@ public final class RuleListMenu implements MenuHolder {
         int entry = page * PAGE_SIZE + offset;
         if (entry == rules) {
             ItemStack held = GuiItems.asTemplate(plugin, player.getInventory().getItemInMainHand());
-            later(player, () -> RuleEditorMenu.open(plugin, player, -1, held, defaults(held, true), defaults(held, false), true, true, true, true));
+            CooldownRule draft = held == null
+                    ? null
+                    : CooldownRule.fromItem(held, true, true, true, defaults(held, true), defaults(held, false));
+            later(player, () -> RuleEditorMenu.open(plugin, player, -1, draft, true));
             return;
         }
         if (entry > rules) {
             return;
         }
         CooldownRule rule = plugin.rules().get(entry);
-        later(player, () -> RuleEditorMenu.open(
-                plugin,
-                player,
-                entry,
-                rule.icon(),
-                rule.leftSeconds(),
-                rule.rightSeconds(),
-                rule.potion() != null,
-                rule.cmd() != null,
-                rule.itemModel() != null,
-                true));
+        later(player, () -> RuleEditorMenu.open(plugin, player, entry, rule, true));
     }
 
     private static int defaults(ItemStack stack, boolean left) {
@@ -190,6 +187,7 @@ public final class RuleListMenu implements MenuHolder {
 
     @Override
     public void onDrag(Player player, InventoryDragEvent event) {
+        MenuHolder.freePlayerDrag(event);
     }
 
     @Override

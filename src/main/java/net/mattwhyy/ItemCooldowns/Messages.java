@@ -53,6 +53,10 @@ public final class Messages {
     public static final String DUPLICATE = "gui.duplicate";
     public static final String EDITOR_BOOK = "gui.editor-book";
     public static final String EDITOR_LORE = "gui.editor-lore";
+    public static final String EDITOR_GROUP_LORE = "gui.editor-group-lore";
+    public static final String GROUP_SELECT_ALL = "gui.group-select-all";
+    public static final String NEED_ONE_TYPE = "gui.need-one-type";
+    public static final String RULE_GROUP_COUNT = "gui.rule-group-count";
     public static final String ITEM_SLOT = "gui.item-slot";
     public static final String ITEM_SLOT_EMPTY = "gui.item-slot-empty";
     public static final String LEFT = "gui.left";
@@ -90,6 +94,10 @@ public final class Messages {
     public static final String PRESET_TURTLE_LORE = "gui.preset-name.turtle-lore";
     public static final String PRESET_HEALING = "gui.preset-name.healing";
     public static final String PRESET_HEALING_LORE = "gui.preset-name.healing-lore";
+    public static final String PRESET_POTIONS = "gui.preset-name.potions";
+    public static final String PRESET_POTIONS_LORE = "gui.preset-name.potions-lore";
+    public static final String PRESET_CATEGORY_COUNT = "gui.preset-category-count";
+    public static final String CATEGORY_LORE = "gui.category-lore";
     public static final String PRESET_ADDED = "gui.preset-added";
     public static final String PRESET_EXISTS = "gui.preset-exists";
     public static final String ON_COOLDOWN = "gui.on-cooldown";

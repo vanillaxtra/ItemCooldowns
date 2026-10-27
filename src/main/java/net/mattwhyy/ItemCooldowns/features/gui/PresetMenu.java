@@ -18,7 +18,7 @@ public final class PresetMenu implements MenuHolder {
     private static final int SIZE = 36;
     private static final int BOOK = 4;
     private static final int BACK = 27;
-    private static final int[] SLOTS = concat(GuiItems.rowSlots(1, 6), GuiItems.rowSlots(2, 6));
+    private static final int[] SLOTS = GuiItems.rowsOf(6, 1, 2);
 
     private final ItemCooldownsPlugin plugin;
     private final Inventory inventory;
@@ -45,21 +45,29 @@ public final class PresetMenu implements MenuHolder {
         GuiItems.fill(inventory, GuiItems.filler(plugin));
         inventory.setItem(BOOK, GuiItems.button(plugin, Material.BOOK, Messages.PRESETS, Messages.PRESETS_LORE));
         inventory.setItem(BACK, GuiItems.button(plugin, Material.ARROW, Messages.BACK));
-        for (int i = 0; i < presets.size() && i < SLOTS.length; i++) {
-            inventory.setItem(SLOTS[i], icon(presets.get(i)));
+        refresh();
+    }
+
+    private void refresh() {
+        for (int i = 0; i < SLOTS.length; i++) {
+            if (i < presets.size()) {
+                inventory.setItem(SLOTS[i], icon(presets.get(i)));
+            }
         }
     }
 
     private ItemStack icon(CooldownPresets.Preset preset) {
+        CooldownRule rule = preset.rule();
+        boolean on = rule != null && plugin.rules().enabled(rule);
         List<Component> lore = new ArrayList<>();
-        lore.add(timeLine(preset));
+        lore.add(on ? timeLine(preset) : Messages.text(Messages.SECONDS_OFF));
         if (preset.extraLoreKey() != null) {
             lore.add(Messages.text(preset.extraLoreKey()));
         }
-        return GuiItems.named(plugin, preset.icon(), Messages.text(preset.nameKey()), lore, false);
+        return GuiItems.named(plugin, preset.icon(), Messages.text(preset.nameKey()), lore, on);
     }
 
-    private static Component timeLine(CooldownPresets.Preset preset) {
+    static Component timeLine(CooldownPresets.Preset preset) {
         if (preset.left() > 0 && preset.right() > 0) {
             return Messages.text(Messages.PRESET_TIME_BOTH, "seconds", String.valueOf(preset.left()));
         }
@@ -77,51 +85,29 @@ public final class PresetMenu implements MenuHolder {
     @Override
     public void onClick(Player player, InventoryClickEvent event) {
         int raw = event.getRawSlot();
+        if (raw >= SIZE) {
+            MenuHolder.freePlayerInv(event);
+            return;
+        }
         if (raw == BACK) {
             later(player, () -> RuleListMenu.open(plugin, player, 0, true));
             return;
         }
-        int index = indexOf(raw);
+        int index = GuiItems.indexOf(SLOTS, raw);
         if (index < 0 || index >= presets.size()) {
             return;
         }
-        CooldownPresets.Preset preset = presets.get(index);
-        later(player, () -> apply(player, preset));
-    }
-
-    private void apply(Player player, CooldownPresets.Preset preset) {
-        List<CooldownRule> rules = new ArrayList<>();
-        for (ItemStack item : preset.items()) {
-            CooldownRule rule = CooldownRule.fromItem(item, true, false, false, preset.left(), preset.right());
-            if (rule != null) {
-                rules.add(rule);
-            }
-        }
-        int added = plugin.rules().addMissing(rules);
-        if (added == 0) {
-            MenuSounds.deny(player);
-            Messages.actionBar(player, Messages.PRESET_EXISTS);
+        CooldownRule rule = presets.get(index).rule();
+        if (rule == null) {
             return;
         }
-        MenuSounds.save(player);
-        Messages.actionBar(player, Messages.PRESET_ADDED, "count", String.valueOf(added));
-        RuleListMenu.open(plugin, player, 0, false);
-    }
-
-    private static int indexOf(int slot) {
-        for (int i = 0; i < SLOTS.length; i++) {
-            if (SLOTS[i] == slot) {
-                return i;
-            }
+        boolean on = plugin.rules().toggle(rule);
+        refresh();
+        if (on) {
+            MenuSounds.toggleOn(player);
+        } else {
+            MenuSounds.toggleOff(player);
         }
-        return -1;
-    }
-
-    private static int[] concat(int[] first, int[] second) {
-        int[] all = new int[first.length + second.length];
-        System.arraycopy(first, 0, all, 0, first.length);
-        System.arraycopy(second, 0, all, first.length, second.length);
-        return all;
     }
 
     private void later(Player player, Runnable action) {
@@ -142,6 +128,7 @@ public final class PresetMenu implements MenuHolder {
 
     @Override
     public void onDrag(Player player, InventoryDragEvent event) {
+        MenuHolder.freePlayerDrag(event);
     }
 
     @Override

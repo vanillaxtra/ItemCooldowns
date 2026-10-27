@@ -98,7 +98,14 @@ public final class GuiItems {
         if (rule.rightSeconds() > 0) {
             lore.add(Messages.text(Messages.RULE_RIGHT, "seconds", seconds(rule.rightSeconds())));
         }
-        if (rule.potion() != null) {
+        if (rule.grouped()) {
+            lore.add(Messages.text(
+                    Messages.RULE_GROUP_COUNT,
+                    "on",
+                    String.valueOf(rule.enabled().size()),
+                    "total",
+                    String.valueOf(CooldownRule.groupKeys(rule.group()).size())));
+        } else if (rule.potion() != null) {
             lore.add(Messages.text(Messages.RULE_MATCH_POTION, "value", pretty(rule.potion().name())));
         }
         if (rule.cmd() != null) {
@@ -107,7 +114,8 @@ public final class GuiItems {
         if (rule.itemModel() != null) {
             lore.add(Messages.text(Messages.RULE_MATCH_MODEL, "value", rule.itemModel().asString()));
         }
-        return named(plugin, icon, shownName(player, icon), lore, false);
+        Component name = rule.groupNameKey() == null ? shownName(player, icon) : Messages.text(rule.groupNameKey());
+        return named(plugin, icon, name, lore, false);
     }
 
     public static void fill(Inventory inventory, ItemStack filler) {
@@ -140,6 +148,26 @@ public final class GuiItems {
             slots[i] = start + i;
         }
         return slots;
+    }
+
+    public static int[] rowsOf(int count, int... rows) {
+        int[] all = new int[rows.length * count];
+        int offset = 0;
+        for (int row : rows) {
+            int[] slots = rowSlots(row, count);
+            System.arraycopy(slots, 0, all, offset, slots.length);
+            offset += slots.length;
+        }
+        return all;
+    }
+
+    public static int indexOf(int[] slots, int slot) {
+        for (int i = 0; i < slots.length; i++) {
+            if (slots[i] == slot) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static ItemStack filler(ItemCooldownsPlugin plugin) {
