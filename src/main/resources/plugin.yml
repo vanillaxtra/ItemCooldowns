@@ -1,31 +1,36 @@
 name: ItemCooldowns
-version: '1.01'
-main: net.mattwhyy.ItemCooldowns.ItemCooldowns
-api-version: '1.19'
-authors: [ mattwhyy ]
-description: Allows you to easily set a cooldown for any item
+version: '${version}'
+main: net.mattwhyy.itemcooldowns.ItemCooldownsPlugin
+api-version: '${apiVersion}'
+authors: [mattwhyy]
+description: Set left-click and right-click cooldowns for items, potions, and custom models
 commands:
+  itemcooldowns:
+    description: Open the cooldown menu
+    usage: /itemcooldowns [reload]
+    aliases: [icd, cooldowns]
+    permission: itemcooldowns.admin
   setcooldown:
     description: Set a cooldown for an item
     usage: /setcooldown <item> <seconds>
     permission: itemcooldowns.set
-    permission-message: You do not have permission to use this command.
   resetcooldown:
-    description: Reset all cooldowns for the player
-    usage: /resetcooldown
+    description: Reset a cooldown or all cooldowns
+    usage: /resetcooldown <item|all>
     permission: itemcooldowns.reset
-    permission-message: You do not have permission to use this command.
   getcooldown:
-    description: Check the current cooldown of an item
+    description: Check an item's cooldown
     usage: /getcooldown <item>
     permission: itemcooldowns.get
-    permission-message: You do not have permission to use this command.
 permissions:
+  itemcooldowns.admin:
+    description: Open the cooldown GUI and reload
+    default: op
   itemcooldowns.set:
     description: Allows setting item cooldowns
     default: op
   itemcooldowns.reset:
-    description: Allows resetting all cooldowns
+    description: Allows resetting item cooldowns
     default: op
   itemcooldowns.get:
     description: Allows checking an item's cooldown

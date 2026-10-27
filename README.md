@@ -14,13 +14,17 @@
 
 Whether it's a Totem of Undying, Trident, Bow, Crossbow, Shield, or even melee weapons, the plugin ensures that cooldowns are applied at the right time, only after the item is **actually used!**
 ## Configuration
-```
-cooldowns:
-  # Example config
-  # diamond_sword: 10
-  # ender_pearl: 5
-```
+Use **`/itemcooldowns`** (or `/icd`) to open the GUI. Set a left-click time and a right-click time per rule. Presets cover ender pearls, tridents, wind charges, maces, spears, chorus fruit, and firework rockets. Drop a potion or a custom-model item into the editor to limit only that variant.
+
+Old `cooldowns:` maps in `config.yml` are migrated automatically.
 ## Commands
+```/itemcooldowns``` —
+Opens the cooldown GUI. `/itemcooldowns reload` reloads config.
+
+**Required permission:**
+```itemcooldowns.admin```
+- default: op
+
 ```/setcooldown <item> <seconds>``` -
 Allows you to set the cooldown easily in-game.
 

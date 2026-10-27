@@ -1,4 +1,4 @@
-cooldowns:
-  # Example config
-  # diamond_sword: 10
-  # ender_pearl: 5
+# ItemCooldowns schema 2 — left/right click rules.
+# Prefer /itemcooldowns in-game. Old `cooldowns:` maps are migrated on first load.
+schema: 2
+rules: {}
