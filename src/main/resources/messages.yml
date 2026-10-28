@@ -1,4 +1,4 @@
-version: 8
+version: 9
 
 command:
   players-only: "<red>Only players can open this GUI."
@@ -48,7 +48,7 @@ gui:
   editor-book: "<white>Cooldown"
   editor-lore: "<gray>One timer per item.</gray>"
   editor-group-lore: "<gray>Every bottle shares this timer.</gray>"
-  editor-spear-lore: "<gray>Every spear shares this attack timer.</gray>"
+  editor-spear-lore: "<gray>Every spear shares this lunge timer.</gray>"
   group-select-all: "<dark_gray>Click to turn every type on"
   need-one-type: "<red>Turn on at least one type"
   item-slot: "<white>Item"
@@ -101,7 +101,7 @@ gui:
     wind-charge: "<white>Wind Charge"
     mace: "<white>Mace"
     spear: "<white>Spear"
-    spear-lore: "<dark_gray>All spears · attack only</dark_gray>"
+    spear-lore: "<dark_gray>All spears · lunge only</dark_gray>"
     chorus: "<white>Chorus Fruit"
     firework: "<white>Firework Rocket"
     golden-apple: "<white>Golden Apple"

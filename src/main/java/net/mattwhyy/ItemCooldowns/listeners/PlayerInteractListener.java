@@ -2,6 +2,7 @@ package net.mattwhyy.itemcooldowns.listeners;
 
 import net.mattwhyy.itemcooldowns.ItemCooldownsPlugin;
 import net.mattwhyy.itemcooldowns.features.cooldown.ClickSide;
+import net.mattwhyy.itemcooldowns.features.cooldown.CooldownRule;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,7 +56,7 @@ public final class PlayerInteractListener implements Listener {
                 || material == Material.LINGERING_POTION) {
             return true;
         }
-        if (material == Material.WIND_CHARGE) {
+        if (material == Material.WIND_CHARGE || CooldownRule.spear(material)) {
             return true;
         }
         return material == Material.FIREWORK_ROCKET && player.isGliding();

@@ -113,7 +113,9 @@ public final class GuiItems {
         } else {
             lore.add(Messages.text(Messages.COOLDOWN, "seconds", String.valueOf(seconds)));
         }
-        if (CooldownRule.interactable(material)) {
+        if (CooldownRule.lungeOnly(material)) {
+            lore.add(Messages.text(Messages.KIND_LUNGE));
+        } else if (CooldownRule.interactable(material)) {
             lore.add(Messages.text(Messages.KIND_USE));
         } else {
             lore.add(Messages.text(Messages.KIND_ATTACK));

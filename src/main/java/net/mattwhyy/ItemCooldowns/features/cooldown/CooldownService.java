@@ -6,6 +6,7 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.mattwhyy.itemcooldowns.ItemCooldownsPlugin;
 import net.mattwhyy.itemcooldowns.Messages;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,6 +45,15 @@ public final class CooldownService {
         boolean vanilla = !rule.specific() && oneSided(rule);
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             if (!player.isOnline()) {
+                return;
+            }
+            if (rule.group() == CooldownRule.Group.SPEAR) {
+                for (String key : rule.enabled()) {
+                    Material material = CooldownRule.materialOf(key);
+                    if (material != null) {
+                        player.setCooldown(material, seconds * 20);
+                    }
+                }
                 return;
             }
             if (vanilla) {

@@ -22,6 +22,7 @@ import net.mattwhyy.itemcooldowns.listeners.PlayerLaunchProjectileListener;
 import net.mattwhyy.itemcooldowns.listeners.PlayerQuitListener;
 import net.mattwhyy.itemcooldowns.listeners.PlayerRiptideListener;
 import net.mattwhyy.itemcooldowns.listeners.ShieldBlockListener;
+import net.mattwhyy.itemcooldowns.listeners.SpearLungeListener;
 import net.mattwhyy.itemcooldowns.listeners.TotemResurrectListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
@@ -51,6 +52,7 @@ public final class ItemCooldownsPlugin extends JavaPlugin {
         pluginManager.registerEvents(new PlayerLaunchProjectileListener(this), this);
         pluginManager.registerEvents(new PlayerRiptideListener(this), this);
         pluginManager.registerEvents(new MeleeAttackListener(this), this);
+        pluginManager.registerEvents(new SpearLungeListener(this), this);
         pluginManager.registerEvents(new ShieldBlockListener(this), this);
         pluginManager.registerEvents(new TotemResurrectListener(this), this);
         pluginManager.registerEvents(new PlayerElytraBoostListener(this), this);

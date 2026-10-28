@@ -138,8 +138,12 @@ public final class CooldownRule {
         return material.name().endsWith("_SPEAR");
     }
 
+    public static boolean lungeOnly(Material material) {
+        return spear(material);
+    }
+
     public static boolean interactable(Material material) {
-        return !leftOnly(material);
+        return !leftOnly(material) && !lungeOnly(material);
     }
 
     public static int leftOf(Material material, int seconds) {
@@ -196,6 +200,9 @@ public final class CooldownRule {
     }
 
     public int seconds() {
+        if (lungeOnly(material) || group == Group.SPEAR) {
+            return leftSeconds > 0 ? leftSeconds : rightSeconds;
+        }
         if (interactable(material)) {
             return rightSeconds > 0 ? rightSeconds : leftSeconds;
         }
@@ -203,6 +210,9 @@ public final class CooldownRule {
     }
 
     public int seconds(ClickSide side) {
+        if (lungeOnly(material) || group == Group.SPEAR) {
+            return side == ClickSide.LUNGE ? seconds() : 0;
+        }
         return side == ClickSide.LEFT ? leftSeconds : rightSeconds;
     }
 
@@ -360,7 +370,7 @@ public final class CooldownRule {
     }
 
     public static boolean leftOnly(Material material) {
-        return meleeDefault(material) && !bothDefault(material);
+        return meleeDefault(material) && !bothDefault(material) && !lungeOnly(material);
     }
 
     public static boolean showLeft(Material material) {

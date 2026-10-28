@@ -4,8 +4,6 @@ main: net.mattwhyy.itemcooldowns.ItemCooldownsPlugin
 api-version: '${apiVersion}'
 authors: [mattwhyy]
 description: Set left-click and right-click cooldowns for items, potions, and custom models
-libraries:
-  - org.bstats:bstats-bukkit:${bstatsVersion}
 commands:
   itemcooldowns:
     description: Open the cooldown menu
