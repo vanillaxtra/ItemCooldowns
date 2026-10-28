@@ -93,14 +93,8 @@ public final class GuiItems {
         ItemStack icon = rule.icon();
         List<Component> lore = new ArrayList<>();
         addCooldownLore(lore, rule.material(), rule.seconds());
-        if (rule.group().split()) {
-            lore.add(Messages.text(
-                    Messages.RULE_GROUP_COUNT,
-                    "on",
-                    String.valueOf(rule.enabled().size()),
-                    "total",
-                    String.valueOf(CooldownRule.groupKeys(rule.group()).size())));
-        } else if (!rule.grouped() && rule.potion() != null) {
+        lore.add(Messages.text(rule.active() ? Messages.STATUS_ON : Messages.STATUS_OFF));
+        if (!rule.grouped() && rule.potion() != null) {
             lore.add(Messages.text(Messages.RULE_MATCH_POTION, "value", pretty(rule.potion().name())));
         }
         if (rule.cmd() != null) {
@@ -110,18 +104,19 @@ public final class GuiItems {
             lore.add(Messages.text(Messages.RULE_MATCH_MODEL, "value", rule.itemModel().asString()));
         }
         Component name = rule.groupNameKey() == null ? shownName(player, icon) : Messages.text(rule.groupNameKey());
-        return named(plugin, icon, name, lore, false);
+        return named(plugin, icon, name, lore, rule.active());
     }
 
     public static void addCooldownLore(List<Component> lore, Material material, int seconds) {
-        if (seconds <= 0) {
-            lore.add(Messages.text(CooldownRule.interactable(material) ? Messages.COOLDOWN_OFF_USE : Messages.COOLDOWN_OFF_ATTACK));
-            return;
+        String key;
+        if (CooldownRule.lungeOnly(material)) {
+            key = seconds <= 0 ? Messages.COOLDOWN_OFF_LUNGE : Messages.COOLDOWN_LUNGE;
+        } else if (CooldownRule.interactable(material)) {
+            key = seconds <= 0 ? Messages.COOLDOWN_OFF_USE : Messages.COOLDOWN_USE;
+        } else {
+            key = seconds <= 0 ? Messages.COOLDOWN_OFF_ATTACK : Messages.COOLDOWN_ATTACK;
         }
-        lore.add(Messages.text(
-                CooldownRule.interactable(material) ? Messages.COOLDOWN_USE : Messages.COOLDOWN_ATTACK,
-                "seconds",
-                String.valueOf(seconds)));
+        lore.add(Messages.text(key, "seconds", String.valueOf(seconds)));
     }
 
     public static void fill(Inventory inventory, ItemStack filler) {

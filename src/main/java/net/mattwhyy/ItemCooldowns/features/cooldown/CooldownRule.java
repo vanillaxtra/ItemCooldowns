@@ -22,12 +22,8 @@ public final class CooldownRule {
         TURTLE_MASTER,
         INSTANT_HEALTH;
 
-        public boolean split() {
-            return this == SPEAR;
-        }
-
         public boolean locked() {
-            return this == TURTLE_MASTER || this == INSTANT_HEALTH;
+            return this != NONE;
         }
     }
 
@@ -53,6 +49,7 @@ public final class CooldownRule {
     private final int rightSeconds;
     private final Group group;
     private final Set<String> enabled;
+    private final boolean active;
 
     public CooldownRule(
             String id,
@@ -75,6 +72,20 @@ public final class CooldownRule {
             int rightSeconds,
             Group group,
             Set<String> enabled) {
+        this(id, material, potion, cmd, itemModel, leftSeconds, rightSeconds, group, enabled, true);
+    }
+
+    public CooldownRule(
+            String id,
+            Material material,
+            PotionType potion,
+            Integer cmd,
+            NamespacedKey itemModel,
+            int leftSeconds,
+            int rightSeconds,
+            Group group,
+            Set<String> enabled,
+            boolean active) {
         this.id = id == null || id.isBlank() ? UUID.randomUUID().toString() : id;
         this.material = material;
         this.potion = potion;
@@ -86,6 +97,7 @@ public final class CooldownRule {
         this.enabled = this.group == Group.NONE
                 ? Set.of()
                 : this.group.locked() ? Set.copyOf(groupKeys(this.group)) : Set.copyOf(enabled);
+        this.active = active;
     }
 
     public static CooldownRule fromItem(
@@ -122,16 +134,30 @@ public final class CooldownRule {
                 new LinkedHashSet<>(groupKeys(group)));
     }
 
+    public static boolean spear(Material material) {
+        return material.name().endsWith("_SPEAR");
+    }
+
+    public static boolean lungeOnly(Material material) {
+        return spear(material);
+    }
+
     public static boolean interactable(Material material) {
-        return !leftOnly(material);
+        return !leftOnly(material) && !lungeOnly(material);
     }
 
     public static int leftOf(Material material, int seconds) {
-        return interactable(material) ? 0 : seconds;
+        if (lungeOnly(material) || interactable(material)) {
+            return 0;
+        }
+        return seconds;
     }
 
     public static int rightOf(Material material, int seconds) {
-        return interactable(material) ? seconds : 0;
+        if (lungeOnly(material) || interactable(material)) {
+            return seconds;
+        }
+        return 0;
     }
 
     public String id() {
@@ -170,7 +196,19 @@ public final class CooldownRule {
         return enabled;
     }
 
+    public boolean active() {
+        return active;
+    }
+
+    public CooldownRule withActive(boolean active) {
+        return new CooldownRule(
+                id, material, potion, cmd, itemModel, leftSeconds, rightSeconds, group, enabled, active);
+    }
+
     public int seconds() {
+        if (lungeOnly(material) || group == Group.SPEAR) {
+            return rightSeconds > 0 ? rightSeconds : leftSeconds;
+        }
         if (interactable(material)) {
             return rightSeconds > 0 ? rightSeconds : leftSeconds;
         }
@@ -178,6 +216,9 @@ public final class CooldownRule {
     }
 
     public int seconds(ClickSide side) {
+        if (lungeOnly(material) || group == Group.SPEAR) {
+            return side == ClickSide.LUNGE ? seconds() : 0;
+        }
         return side == ClickSide.LEFT ? leftSeconds : rightSeconds;
     }
 
@@ -192,7 +233,8 @@ public final class CooldownRule {
                 leftOf(material, value),
                 rightOf(material, value),
                 group,
-                enabled);
+                enabled,
+                active);
     }
 
     public boolean grouped() {
@@ -313,7 +355,7 @@ public final class CooldownRule {
     }
 
     public static boolean bothDefault(Material material) {
-        return material == Material.TRIDENT || material.name().endsWith("_SPEAR");
+        return material == Material.TRIDENT;
     }
 
     public static boolean rightOnly(Material material) {
@@ -364,7 +406,7 @@ public final class CooldownRule {
 
     private static Material groupIcon(Group group) {
         return switch (group) {
-            case SPEAR -> firstSpear();
+            case SPEAR -> spearIcon();
             case TURTLE_MASTER, INSTANT_HEALTH -> Material.POTION;
             case NONE -> Material.BARRIER;
         };
@@ -378,7 +420,11 @@ public final class CooldownRule {
         };
     }
 
-    private static Material firstSpear() {
+    private static Material spearIcon() {
+        Material netherite = materialOf("NETHERITE_SPEAR");
+        if (netherite != null) {
+            return netherite;
+        }
         for (String key : SPEAR_KEYS) {
             Material material = materialOf(key);
             if (material != null) {

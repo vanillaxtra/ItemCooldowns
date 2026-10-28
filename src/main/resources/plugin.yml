@@ -8,7 +8,6 @@ commands:
   itemcooldowns:
     description: Open the cooldown menu
     usage: /itemcooldowns [reload]
-    aliases: [icd, cooldowns]
     permission: itemcooldowns.admin
   setcooldown:
     description: Set a cooldown for an item

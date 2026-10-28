@@ -2,8 +2,10 @@ package net.mattwhyy.itemcooldowns.listeners;
 
 import net.mattwhyy.itemcooldowns.ItemCooldownsPlugin;
 import net.mattwhyy.itemcooldowns.features.cooldown.ClickSide;
+import net.mattwhyy.itemcooldowns.features.cooldown.CooldownRule;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,23 +21,43 @@ public final class PlayerInteractListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(PlayerInteractEvent event) {
         Action action = event.getAction();
-        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
-            return;
-        }
         if (event.getHand() != EquipmentSlot.HAND && event.getHand() != EquipmentSlot.OFF_HAND) {
             return;
         }
         Player player = event.getPlayer();
         ItemStack stack = event.getItem();
-        if (stack == null || stack.getType().isAir() || deferred(player, stack.getType())) {
+        if (stack == null || stack.getType().isAir()) {
+            return;
+        }
+        if (CooldownRule.lungeOnly(stack.getType())) {
+            if (!lungeClick(action)) {
+                return;
+            }
+            if (!plugin.cooldowns().use(player, stack, ClickSide.LUNGE)) {
+                event.setCancelled(true);
+                event.setUseItemInHand(Result.DENY);
+            }
+            return;
+        }
+        if (event.isCancelled()) {
+            return;
+        }
+        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+        if (deferred(player, stack.getType())) {
             return;
         }
         if (!plugin.cooldowns().use(player, stack, ClickSide.RIGHT)) {
             event.setCancelled(true);
         }
+    }
+
+    private static boolean lungeClick(Action action) {
+        return action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
     }
 
     private static boolean deferred(Player player, Material material) {

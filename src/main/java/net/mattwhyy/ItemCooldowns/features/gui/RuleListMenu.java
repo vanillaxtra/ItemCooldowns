@@ -69,7 +69,13 @@ public final class RuleListMenu implements MenuHolder {
 
     private void paint() {
         GuiItems.frame(inventory, plugin);
-        inventory.setItem(BOOK, GuiItems.button(plugin, Material.BOOK, Messages.HELP_NAME, Messages.LIST_LORE));
+        inventory.setItem(BOOK, GuiItems.button(
+                plugin,
+                Material.BOOK,
+                Messages.HELP_NAME,
+                Messages.LIST_LORE,
+                Messages.LIST_TOGGLE,
+                Messages.LIST_ADD));
         inventory.setItem(PRESETS, GuiItems.button(plugin, Material.CHEST, Messages.PRESETS, Messages.PRESETS_LORE));
         List<CooldownRule> rules = plugin.rules().rules();
         int start = page * PAGE_SIZE;
@@ -141,6 +147,16 @@ public final class RuleListMenu implements MenuHolder {
             return;
         }
         CooldownRule rule = plugin.rules().get(entry);
+        if (event.getClick().isRightClick()) {
+            plugin.rules().setActive(entry, !rule.active());
+            paint();
+            if (plugin.rules().get(entry).active()) {
+                MenuSounds.toggleOn(player);
+            } else {
+                MenuSounds.toggleOff(player);
+            }
+            return;
+        }
         later(player, () -> RuleEditorMenu.open(plugin, player, entry, rule, true));
     }
 

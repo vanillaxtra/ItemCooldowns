@@ -36,6 +36,8 @@ public final class Messages {
     public static final String TITLE_CONFIRM = "gui.title.confirm";
     public static final String HELP_NAME = "gui.help-name";
     public static final String LIST_LORE = "gui.list-lore";
+    public static final String LIST_TOGGLE = "gui.list-toggle";
+    public static final String LIST_ADD = "gui.list-add";
     public static final String PRESETS = "gui.presets";
     public static final String PRESETS_LORE = "gui.presets-lore";
     public static final String ADD = "gui.add";
@@ -44,6 +46,9 @@ public final class Messages {
     public static final String BACK = "gui.back";
     public static final String SAVE = "gui.save";
     public static final String DELETE = "gui.delete";
+    public static final String DELETE_LORE = "gui.delete-lore";
+    public static final String STATUS_ON = "gui.status-on";
+    public static final String STATUS_OFF = "gui.status-off";
     public static final String CONFIRM = "gui.confirm";
     public static final String CANCEL = "gui.cancel";
     public static final String SAVED = "gui.saved";
@@ -54,6 +59,7 @@ public final class Messages {
     public static final String EDITOR_BOOK = "gui.editor-book";
     public static final String EDITOR_LORE = "gui.editor-lore";
     public static final String EDITOR_GROUP_LORE = "gui.editor-group-lore";
+    public static final String EDITOR_SPEAR_LORE = "gui.editor-spear-lore";
     public static final String GROUP_SELECT_ALL = "gui.group-select-all";
     public static final String NEED_ONE_TYPE = "gui.need-one-type";
     public static final String RULE_GROUP_COUNT = "gui.rule-group-count";
@@ -64,6 +70,8 @@ public final class Messages {
     public static final String COOLDOWN_ATTACK = "gui.cooldown-attack";
     public static final String COOLDOWN_OFF_USE = "gui.cooldown-off-use";
     public static final String COOLDOWN_OFF_ATTACK = "gui.cooldown-off-attack";
+    public static final String COOLDOWN_LUNGE = "gui.cooldown-lunge";
+    public static final String COOLDOWN_OFF_LUNGE = "gui.cooldown-off-lunge";
     public static final String COOLDOWN_UNSET = "gui.cooldown-unset";
     public static final String DROP_HINT = "gui.drop-hint";
     public static final String LEFT = "gui.left";
@@ -71,6 +79,10 @@ public final class Messages {
     public static final String SECONDS_OFF = "gui.seconds-off";
     public static final String SECONDS_ON = "gui.seconds-on";
     public static final String ADJUST_HINT = "gui.adjust-hint";
+    public static final String ADJUST_LEFT = "gui.adjust-left";
+    public static final String ADJUST_RIGHT = "gui.adjust-right";
+    public static final String ADJUST_SHIFT_LEFT = "gui.adjust-shift-left";
+    public static final String ADJUST_SHIFT_RIGHT = "gui.adjust-shift-right";
     public static final String MATCH_POTION_ON = "gui.match-potion-on";
     public static final String MATCH_POTION_OFF = "gui.match-potion-off";
     public static final String MATCH_CMD_ON = "gui.match-cmd-on";

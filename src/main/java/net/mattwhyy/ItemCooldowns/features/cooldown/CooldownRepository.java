@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 
 public final class CooldownRepository {
-    public static final int SCHEMA = 4;
+    public static final int SCHEMA = 5;
     private static final long SAVE_DELAY = 40L;
 
     private final ItemCooldownsPlugin plugin;
@@ -45,6 +45,9 @@ public final class CooldownRepository {
         CooldownRule best = null;
         int bestScore = -1;
         for (CooldownRule rule : rules) {
+            if (!rule.active()) {
+                continue;
+            }
             int scored = rule.score(probe);
             if (scored > bestScore) {
                 bestScore = scored;
@@ -123,6 +126,14 @@ public final class CooldownRepository {
         return toggle(rule);
     }
 
+    public void setActive(int index, boolean active) {
+        CooldownRule old = get(index);
+        if (old == null || old.active() == active) {
+            return;
+        }
+        replace(index, old.withActive(active));
+    }
+
     public void replace(int index, CooldownRule rule) {
         if (index < 0 || index >= rules.size()) {
             return;
@@ -182,7 +193,8 @@ public final class CooldownRepository {
                     entry.getInt("left"),
                     entry.getInt("right"),
                     group,
-                    enabled));
+                    enabled,
+                    entry.getBoolean("active", true)));
         }
         boolean stale = config.getInt("schema") < SCHEMA;
         if (stale) {
@@ -213,6 +225,7 @@ public final class CooldownRepository {
             config.set(path + ".right", rule.rightSeconds());
             config.set(path + ".group", rule.grouped() ? rule.group().name() : null);
             config.set(path + ".enabled", rule.grouped() ? List.copyOf(rule.enabled()) : null);
+            config.set(path + ".active", rule.active());
         }
         plugin.saveConfig();
     }
