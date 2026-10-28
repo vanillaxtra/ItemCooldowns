@@ -1,59 +1,219 @@
-# ItemCooldowns Cool!
-![Enviroment](https://img.shields.io/badge/Enviroment-Server-blue?logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AYht%2BmalUqDnYQEclQneyiIo6likWwUNoKrTqYXPoHTRqSFBdHwbXg4M9i1cHFWVcHV0EQ%2FAFxdnBSdJESv0sKLWI8uLuH97735e47QGhUmGp2RQFVs4xUPCZmc6ti4BU9CKCP1jGJmXoivZiB5%2Fi6h4%2FvdxGe5V335xhQ8iYDfCJxlOmGRbxBPLtp6Zz3iUOsJCnE58STBl2Q%2BJHrsstvnIsOCzwzZGRS88QhYrHYwXIHs5KhEs8QhxVVo3wh67LCeYuzWqmx1j35C4N5bSXNdZqjiGMJCSQhQkYNZVRgIUK7RoqJFJ3HPPwjjj9JLplcZTByLKAKFZLjB%2F%2BD3701C9NTblIwBnS%2F2PbHOBDYBZp12%2F4%2Btu3mCeB%2FBq60tr%2FaAOY%2BSa%2B3tfARMLgNXFy3NXkPuNwBhp90yZAcyU9TKBSA9zP6phwwdAv0r7l9a53j9AHIUK%2BWb4CDQ2CiSNnrHu%2Fu7ezbvzWt%2Fv0ATphymIBZ6aQAAAAGYktHRAAKAAwAGd6C8noAAAAJcEhZcwAADdcAAA3XAUIom3gAAAAHdElNRQfoBgcOHRYlcgoRAAABRklEQVR42u2YMUoDQRRAX0axUzCteIZ4hKn0FDmFhalSWKkgnkHt9AQWwhzBNr2tBGNno82ACwm6EZvxvwdTzP8s7P8zu8w8EJHIDABKKfvAFXAIbP%2Fzmt%2BAR2CSc54NavFPwDDY4s%2BBUaorPwy4%2B3eBy1S3fVSOUoBv%2Fjt2UmMv%2FA6cAHt1TGqsb36JzcYaMM05X3Tm56UUgLOe%2BSVa2wE3K2LXa%2BSbb8BgRWxjjXzzDRj%2FEBv3fOarY6WUj8Z%2BglPgtlPcKbDVM998A%2F6cVM%2FGUXlN9WIQlYdUDwvzgMW%2FAMcp5zwDRsA9sAhQ%2BAK4Aw5yzs8aEZHY6AR1gjpBnaBOsLHrsE6wM9cJohPUCeoE0Qn%2BHp0gOkGdoE5QRMKiE9QJ6gR1gjrBxq7DOsHOXCeITlAnqBNEJ%2Fh7dILoBHWCOkERCcsncuextWq5TzoAAAAASUVORK5CYII%3D&color=blue)
-![Versions](https://img.shields.io/modrinth/game-versions/itemcooldowns?&label=Versions&color=%23249141)
+# ItemCooldowns
 
-![Paper](https://img.shields.io/badge/Available%20for-Paper-%23ED8106?style=flat&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAABfAAAAXwEqnu0dAAAAB3RJTUUH4AYQAzU3HQPK%2FQAAAtxJREFUWMO91k9oXFUUBvDfnfeYNG1hUrCbbhpwIQoVoYgiLkoXRcGVW6G4qBqwZaJCKYJKumoL%2FTMtqUWXbkRIddEWChpFFNpNt239Q5D%2BWVihNJYkMGaui0yGycy8znuZJGf14N17v3PPd77vnhBjtJERJpSN%2BAGvYr60oeBnnTRivglOMJxuCPBJr0t9g60dvxrrmkA4YYeyaalnei6IHq8bBeGMrw25K2SAL1FwL10Hnj8RfSZIciy%2FsWYJhPNeVHcFT%2FW4aRSbX%2B2RuhgGlWH4QsWCn%2FG83kfVBXXR5q4%2FVWlpQJ6%2FtOChmAk%2BK7rVEzxoRBbTVfJ8QMOkoCyrgNFfSqbwYZYCllgoxvML6i5jRwebnTGtbFLd1JMUkDuBMGGrbb4XvdR3ceKcOcdwp58CoG8PhJrPbTObAzxKveegDwz5ve%2FZqYuQqYJwyn6JCxjOUaRF%2F9kTP%2FJLqJnBaN8dVWnPJgzHjNrkJ4md%2BRrDggVPx8Puh5qpXOBNBaygIJCEmh8NmxFygvOPhyrxsPvhtDG8mWtXUwGtJgynHJX6mFz2uXzIjThud1OWuyXOi7n33mslEGr%2BltiuiCFGX8Vx%2B1sKGXGty2afFKUlBSxTsL2gDx1ZBgcVM0X9RMN37QkcwVyOWzeUvBGrjrc54q9Cj8enX4z7tpVArDoeq7Yo2SO6TU8y6ubtiodcboGfc0L0yiqcvKWAnj4QJpRVTArewrDgkU12xnc9agPfp%2BHqKt%2Bw2VhVyUxgRTIX7I1jprvGrCF38rhoBpU347jn2nsge20nOIkhv60avEMBCh90xjVsGWiCaVNA8QRCDpstoAADlXJlzGG2qALWJoFgUclorKpIPCu4LmT66uPuV3nQKNsXxzyAeNAtvBxI1JzF27TNg8Hd7p4c7PafdiplSWkWY9X7LYPjD%2FyLd7qOKDKWh5oHrbm%2F5Go85LVBC1i0Apeab96fawEO%2FwNRMeOb35r5BQAAAABJRU5ErkJggg%3D%3D&color=blue)
-![Purpur](https://img.shields.io/badge/Available%20for-Purpur-purple?style=flat&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAYdEVYdFNvZnR3YXJlAFBhaW50Lk5FVCA1LjEuN4vW9zkAAAC2ZVhJZklJKgAIAAAABQAaAQUAAQAAAEoAAAAbAQUAAQAAAFIAAAAoAQMAAQAAAAIAAAAxAQIAEAAAAFoAAABphwQAAQAAAGoAAAAAAAAASRkBAOgDAABJGQEA6AMAAFBhaW50Lk5FVCA1LjEuNwADAACQBwAEAAAAMDIzMAGgAwABAAAAAQAAAAWgBAABAAAAlAAAAAAAAAACAAEAAgAEAAAAUjk4AAIABwAEAAAAMDEwMAAAAADjQAdDcBQndgAACG1JREFUWEeVl3mMXVUdxz%2Fn3LPc995MZ7pali60CJRKAQtCy%2FYXgi1NBMRGaFCj%2FkE0BmI0SkvAQAwqEqMIsjTKVowFW8oixgIJhQCxFGqkjNYqDZQWCl2mnZl3z%2Bof93XKtLXALznJu%2B%2Bce77f8%2F0t53cFn9DmPpTxBRQJvII5f4C%2BebD6Sph%2FNzxxlTjwlcPax14956FMUCDy8DheZBbqgLKOR6xjfaNdk%2BoegPt%2F%2BPG2%2FshVc5dlKluDAojEGJm5QmS6ZOKBssKZwCJbIWzFg6Vja7MNUUJrEH7508ND%2FN%2FZ8%2B7P9Lfq3yJD0AjtuFhmZsvEqiR4WQdotkEHaLQ52Tq%2BZCvesBXLS49vDUIW0ByA6%2B4%2BNJQ88A%2BAU1Zk3u%2BFWNSSZkG39twqM1NaQyxWkZe72zX7rgGY9iYYz%2FpRA1ynA40ic3vZpnfqZmgOwdsT4Gdf60h4gI2gdcqKjNf75ZaJ6SLz5SLSazyVCiTj6SsrHrWOoe69NUAqANBF4qIiMst4pA6U1jFgKx4uHRsa7fpAzSH4xor9sAJg9p8yg7Z%2ByDVwj8hcLjPjZGLZaxew6ewVXGAc5%2BiA0IFkK55tOZ5RDorIXJn4vAlo4xBF4uUEj3cPMtE6FpUVVVnxQOl4v9GGJMG24ZJnRU3gM49lkgSvkcpzocycLRNPhoLnja%2BDqUjQaNNlPJdYx3EqEKzHG0cqIrZ0qCKyuUg8kmGHTHU22ACNIU6zji%2FainXNIVZlSWi0YcFzoo4BISAKUIHvysy8lFhsPM8fvQ1KD717YOwuKB17m23us44V1jHDONbpwNqy4jgVedp67raeHaUH42HsbjhrKTTbrO0dYIkJnI5gcVB1bA274MTHM8AsmbjWBN5VgW3W8bB1bCzb8PhJ8JWXQGSkzMwvEqcZR9IBaTzZeLL2FNbx97LNqtLhuvtBZ5AZyEyWict0YKoJTCgit2TB3%2Bav6bjg5JUZ4CwBM23FgA6cpQLCeF61FcutZ6cOnC4T83TAdPy8rgg8OnEzYXAc88uKOTqA8QRbsbpVsabwdBWZS4vImcZTFJEXywpk5i1g9fkvdQicvjwDnC0y44EVzTbTjeMy45mmA%2F3G0a8iyjiyimwrEg9n2K5iHdXWQbNNr3Vcah2TVQDrSdrT0oEx2rO5SCwvHX1lmwsRROCv573SiQHT8Zmu0weR2JQlN6vAvcYhVeTJsmKsCWxViTtaQ2yXGcbshqlbYMJOGDXArtKx1Dr6rGeycTxmPFoFllWGG5Ogr3sv6IDquAz2FSLtwbj9RLoGQQUoHS8Yz%2FqyYoHxlLZiRmuAHzSGOObod6GnH4pYp5RxHGkrrtaeuWVFNp6LjecN4JlGBVmOOCjmwwTsfvBkHbSGYNyOThrVc7qI3Gs8r1vPVBX5nox8XWS6s6DMgstl4lrtmaED%2F9SBpcZTGE8uHZQVzPj3MHgyHjGCwD7w0jGxa7BT3UQNbh3COqR1bEFwlwr8xnje1YHPqcgS4AYdOM94dhSJO3TgttYAmzsgwniYsqVWQAcwgU%2FpQNLhYAU2GMdYW3G1SBw1eg%2FYapgE1qN0AJl5PRpuNJ6V1uOsw6nIE5M2cH0WvDZmN%2BiI2if3vhKcYUKG78jEVO1Zrz5MwNQxMN06ZljHaJX4tkxcvr2JMDUIpkOkNQA9uyBK%2FmIclQ6wfRSrtpxAzmKEj4X2%2BKcmAYLLBFyjIxOM41gdOOEgF1hPqSKrdGC1dSTtmXlkP4utY451ROOJtqoDdMwu6BpAWE%2B2jjRtK6p0MHNjh0DorHfMXriBxUXkVONJMvGcCTyiA%2BVIBfafMABrisDNOtBXVnSrwEbr2NZsM713Tx2gPf3D74gOIE7Ul4z2YB3HqMAHOtCnAz0qsElkfm48q3XAqQg6fjgGagWGN5SwV2buLyK3NSrGGcc%2FjONc47hKJsY7C6euJXcCVIhEnv4OZBidBd%2BUmS9Yx6vGM1Em7syCpRl2ter0FirUaX6wAp16MGpPPbqGeKus%2BJcJzLOOXuM5okhcIxOXvHUsxniC8aTuAQoyCwR8XwWmGEe3DlykAptFZpPXdWdUxHqozjhQAaE9sdmGRlXXgNYgGI%2ByjqAit%2BvAi9aRdeCzqr4xpxjHkdazuEicaes74hXj%2BbUOOB0ojIfeXTBp2zBw2EfkQAXazTYzj1%2BHbA3C2B2d9HRk45HG4YE%2FF5FbtOdN42iowNMm8JTxNHVgi8jcqiIrraOtA1LFWuquobrRMR6KyElFpBpBwDq4YQZrtWfd9mncJBPnDDWHswPjyNYjdACR2Skz96jA761jlnHMFollWXB7Fmzv3Q0qIlUg61CraQIgOCMW%2FETARht5Qe5r%2B6AuFD%2FeADLzpArcXCRmFpElInOUcfh9Fc24Og3H7wAEG4zHqYj4zzheNa7j51SfWgdEEXGNNhMy%2FIjMGWR%2BkWGFl6QavkNgyZ2C0f21z2WmX2Z%2BWySWqcgVJjDfOoIK%2BEa1vw03bYSpe4Z88maUijD17XquSPgi4nXg%2FCT5FrASwa8QfJBFTdSkujE9qFm%2Fb0Gm0Yag6rzu2cOnm0OcqwOiv5t7Jr1Tt%2BI7uxDdba5TEVtEro%2BSMGZ3rUAWLBKZHpl4Okr6VKw%2FVFSERhgJKUc8AVc%2BJiirWo3GEKjIRuX4nYrsnvgeN8nEaUHD%2BP7axyrAyomE0XsAmJUEN5IRKnJXFjV4FqDSweAcSoED7blTM7lzM5aOccazyHis9jxYJL5aRKzx3CkTC0WmkJkHgK2yVoLu9uEhDj%2FbsVdOyBhfu8TUpfZE7VmoI1NUAJl4R2T%2BCLwmU72rSDDqI8A%2FsW08OvN%2BmfnvEZlMFu%2F15sk7uvLUna1c7GxlWJPZ1cwM6EN%2Fhh3K%2FgcDpjxbjzc0ZgAAAABJRU5ErkJggg%3D%3D&color=purple)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://modrinth.com/plugin/itemcooldowns)
+[![Platform](https://img.shields.io/badge/Paper-1.21.11-purple.svg)](https://papermc.io/)
+[![Modrinth](https://img.shields.io/modrinth/dt/itemcooldowns?style=flat&logo=modrinth&label=Downloads&color=00AF5C)](https://modrinth.com/plugin/itemcooldowns)
+[![GitHub](https://img.shields.io/github/downloads/mattwhyy/ItemCooldowns/total?style=flat&logo=github&label=GitHub)](https://github.com/mattwhyy/ItemCooldowns/releases)
 
-[![Download on Modrinth](https://img.shields.io/modrinth/dt/itemcooldowns?style=flat&logo=modrinth&label=Download%20on%20Modrinth&link=https%3A%2F%2Fmodrinth.com%2Fmod%2Fmusichud)](https://modrinth.com/plugin/itemcooldowns)
-[![Download on GitHub](https://img.shields.io/github/downloads/mattwhyy/ItemCooldowns/total?style=flat&logo=github&label=Download%20on%20GitHub)](https://github.com/mattwhyy/ItemCooldowns/releases)
+Per-item cooldowns for **PvP, survival, and minigame servers** — configured in-game with a GUI, stored as **rules** in `config.yml`, and applied only when the item is **actually used** (attack, use, throw, drink, riptide, totem pop, elytra boost, spear lunge, and more).
 
-**ItemCooldowns** is a lightweight plugin that allows you to easily set the cooldown of **ANY** item!
+---
 
-**The plugin automatically detects the type of item and applies cooldowns based on its behavior.**
+## Requirements
 
-Whether it's a Totem of Undying, Trident, Bow, Crossbow, Shield, or even melee weapons, the plugin ensures that cooldowns are applied at the right time, only after the item is **actually used!**
-## Configuration
-Use **`/itemcooldowns`** (or `/icd`) to open the GUI. Set a left-click time and a right-click time per rule. Presets cover ender pearls, tridents, wind charges, maces, spears, chorus fruit, and firework rockets. Drop a potion or a custom-model item into the editor to limit only that variant.
+- **Minecraft:** 1.21.11+ (spear / lunge features need spear items on the server)
+- **Server:** Paper or Purpur (Paper API)
+- **Java:** 21+
 
-Old `cooldowns:` maps in `config.yml` are migrated automatically.
+### Optional
+
+| Plugin | Purpose |
+|--------|---------|
+| None required | Works standalone |
+
+---
+
+## Installation
+
+1. Download the latest release from [Modrinth](https://modrinth.com/plugin/itemcooldowns) or [GitHub Releases](https://github.com/mattwhyy/ItemCooldowns/releases)
+2. Place `ItemCooldowns-3.0.0.jar` in your server’s `plugins/` folder
+3. Restart the server (avoid `/reload`)
+4. Run `/itemcooldowns` to open the GUI, or edit `plugins/ItemCooldowns/config.yml`
+5. Reload with `/itemcooldowns reload`
+
+Old `cooldowns:` entries in config are **migrated automatically** to the new `rules:` format.
+
+---
+
+# 📋 Rule list & GUI
+
+Every cooldown is a **rule**: one timer, smart matching, and optional filters (potion type, custom model data, item model).
+
+* **Rule list** — see all rules, paging, presets chest, emerald to add from hand
+* **Left-click** a rule → open the editor
+* **Right-click** a rule → enable or disable (disabled rules are ignored in-game)
+* Status shows **ᴇɴᴀʙʟᴇᴅ** / **ᴅɪsᴀʙʟᴇᴅ** on each icon
+
+![Rule list and GUI](assets/rule-list-gui.png)
+
+![Enable and disable rules](assets/rule-enable-disable.png)
+
+---
+
+# ⏱️ Edit cooldown time
+
+In the rule editor, use the clock item to set seconds:
+
+* **Left-click** +1s · **Right-click** −1s
+* **Shift + left-click** +5s · **Shift + right-click** −5s
+* Drop a specific item in the center slot, or use a preset / group rule
+* **Auto-saves** when you leave the editor (no save button)
+
+![Edit cooldown duration](assets/rule-editor-time.png)
+
+---
+
+# 📦 Presets
+
+One-click presets add a rule and open the editor:
+
+Ender pearl, trident, wind charge, mace, chorus fruit, firework rocket, golden apple, enchanted golden apple, totem of undying, plus grouped **Spear**, **Turtle Master** (10s), and **Instant Health** (5s).
+
+![Presets menu](assets/presets.png)
+
+---
+
+# 🧊 Item cooldown overlay
+
+When a rule fires, players get:
+
+* **Action bar** — remaining time when they try to use the item again
+* **Hotbar overlay** — white wipe on the item (vanilla-style), including potion groups and custom matches where supported
+
+![Item cooldown overlay](assets/item-cooldown-overlay.png)
+
+---
+
+# ⚔️ Combat & utility examples
+
+Cooldowns apply on **real use**, not idle clicks.
+
+| Item / action | When the timer starts |
+|---------------|------------------------|
+| **Mace** | Melee hit (attack) |
+| **Wind charge** | Throw / use |
+| **Trident** | Throw or **riptide** |
+| **Totem of Undying** | On resurrection |
+| **Spear** | **Lunge** only (full charge + Lunge enchant), not normal jabs |
+| Potions, pearls, bows, shield, elytra firework, etc. | Matching use event |
+
+### Totem
+
+![Totem cooldown](assets/totem-cooldown.png)
+
+### Trident (throw & riptide)
+
+![Trident and riptide cooldown](assets/trident-riptide-cooldown.png)
+
+### Spear lunge
+
+Grouped spear rules share one timer across all tiers. Includes protection against attribute-swap abuse around lunges.
+
+![Spear lunge cooldown](assets/spear-lunge-cooldown.png)
+
+### Mace & wind charge
+
+![Mace and wind charge cooldown](assets/mace-wind-charge-cooldown.png)
+
+---
+
+# 🧪 Grouped rules
+
+Some presets are **one rule, many items**:
+
+| Group | Behavior |
+|-------|----------|
+| **Spear** | All spear materials · **lunge** timer |
+| **Turtle Master** | Drink, splash, lingering · normal / long / strong |
+| **Instant Health** | Drink, splash, lingering · normal + strong |
+
+Using any variant in the group starts the **same** cooldown. Potion groups show the overlay on each matching bottle type.
+
+---
+
+# 🎯 Specific rules
+
+Narrow a rule without affecting every copy of the material:
+
+* **Potion type** — e.g. only Turtle Master in a potion bottle
+* **Custom model data** — datapack / resource-pack items
+* **Item model** — 1.21+ item model keys
+
+The **most specific** matching rule wins (e.g. “mace + CMD 12” does not cooldown other maces).
+
+---
+
+# 🗑️ Removing rules
+
+In the editor, pick up the **barrier** and **drop it outside** the menu → confirm screen → rule removed from config.
+
+---
+
 ## Commands
-```/itemcooldowns``` —
-Opens the cooldown GUI. `/itemcooldowns reload` reloads config.
 
-**Required permission:**
-```itemcooldowns.admin```
-- default: op
+| Command | Permission | Description |
+|---------|------------|-------------|
+| `/itemcooldowns` | `itemcooldowns.admin` | Open the cooldown GUI |
+| `/itemcooldowns reload` | `itemcooldowns.admin` | Reload config and messages |
+| `/setcooldown <item> <seconds>` | `itemcooldowns.set` | Add or update a material-wide rule |
+| `/getcooldown <item>` | `itemcooldowns.get` | Show configured time for a material |
+| `/resetcooldown <item\|all>` | `itemcooldowns.reset` | Remove rule(s) from config |
 
-```/setcooldown <item> <seconds>``` -
-Allows you to set the cooldown easily in-game.
+No command aliases. Namespaced `itemcooldowns:*` suggestions are hidden from the client list.
 
-**Required permission:** 
-```itemcooldowns.set```
-- description: Allows setting item cooldowns
-- default: op
+---
 
-```/getcooldown <item>``` -
-Check the current cooldown of an item.
+## Permissions
 
-**Required permission:** 
-```itemcooldowns.get```
-- description: Allows checking an item's cooldown
-- default: op
+| Permission | Default | Description |
+|------------|---------|-------------|
+| `itemcooldowns.admin` | OP | GUI and reload |
+| `itemcooldowns.set` | OP | `/setcooldown` |
+| `itemcooldowns.get` | OP | `/getcooldown` |
+| `itemcooldowns.reset` | OP | `/resetcooldown` |
 
-```/resetcooldown <item> OR <all>``` -
-Allows you to reset the cooldown of an item, or all cooldowns.
+---
 
-**Required permission:** 
-```itemcooldowns.reset```
-- description: Allows resetting all cooldowns
-- default: op
+## Configuration
+
+| File | Purpose |
+|------|---------|
+| `plugins/ItemCooldowns/config.yml` | Rule list (`rules:`), schema version |
+| `plugins/ItemCooldowns/messages.yml` | GUI and command text (auto-updated by version) |
+
+Rules are saved from the GUI; you can also edit YAML by hand. Use `/itemcooldowns reload` after manual edits.
+
+---
+
 ## Contact
 
-[![Discord Contact](https://img.shields.io/badge/Contact%20on-Discord-%235865f2?logo=discord&link=https%3A%2F%2Fdiscordapp.com%2Fusers%2F555629040455909406)](https://discord.com/users/555629040455909406)
-[![GitHub](https://img.shields.io/badge/Contact%20on-GitHub-green?logo=github&link=left-https%3A%2F%2Fgithub.com%2Fmattwhyy%2FItemCooldowns%2Fissues
-)](https://github.com/mattwhyy/ItemCooldowns/issues)
-## Setup
-Put the ```jar``` file into your server's **plugin folder**.
+[![Discord](https://img.shields.io/badge/Contact-Discord-5865F2?logo=discord&logoColor=white)](https://discord.com/users/555629040455909406)
+[![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-green?logo=github)](https://github.com/mattwhyy/ItemCooldowns/issues)
 
-**Restart** (or reload) the server!
+---
+
+## Statistics
+
+This plugin uses [bStats](https://bstats.org/) (plugin id **34985**) for anonymous usage stats. Opt out via the global bStats config if you prefer.
+
+---
+
+## Screenshot assets
+
+Store showcase images in the repo folder **`assets/`** (same names as in this README). GitHub and Modrinth render them from there once committed.
+
+| File | Use in README section |
+|------|------------------------|
+| `rule-list-gui.png` | Rule list & GUI |
+| `rule-enable-disable.png` | Enable / disable (right-click) |
+| `rule-editor-time.png` | Editing cooldown seconds |
+| `presets.png` | Presets menu |
+| `item-cooldown-overlay.png` | Hotbar wipe + action bar |
+| `totem-cooldown.png` | Totem example |
+| `trident-riptide-cooldown.png` | Trident / riptide |
+| `spear-lunge-cooldown.png` | Spear lunge |
+| `mace-wind-charge-cooldown.png` | Mace & wind charge |
+
+After pushing to GitHub, Modrinth’s long description can use raw links, e.g.  
+`https://raw.githubusercontent.com/mattwhyy/ItemCooldowns/main/assets/rule-list-gui.png`  
+(replace `main` with your default branch if different).
