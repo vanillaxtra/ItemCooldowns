@@ -33,6 +33,7 @@ public final class CooldownPresets {
         add(presets, Messages.PRESET_FIREWORK, "FIREWORK_ROCKET", DEFAULT, null);
         add(presets, Messages.PRESET_GOLDEN_APPLE, "GOLDEN_APPLE", DEFAULT, null);
         add(presets, Messages.PRESET_ENCHANTED_APPLE, "ENCHANTED_GOLDEN_APPLE", DEFAULT, null);
+        add(presets, Messages.PRESET_TOTEM, "TOTEM_OF_UNDYING", DEFAULT, null);
         group(presets, Messages.PRESET_TURTLE, Messages.PRESET_TURTLE_LORE, CooldownRule.Group.TURTLE_MASTER, 10);
         group(presets, Messages.PRESET_HEALING, Messages.PRESET_HEALING_LORE, CooldownRule.Group.INSTANT_HEALTH, DEFAULT);
         return presets;

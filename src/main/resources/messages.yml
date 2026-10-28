@@ -1,6 +1,6 @@
 # MiniMessage works in every line. Gray is the body, white is the emphasis.
 # Green is a success, red is a stop. The plugin does not recolor these.
-version: 7
+version: 8
 
 command:
   players-only: "<red>Only players can open this GUI."
@@ -66,13 +66,18 @@ gui:
   adjust-right: "<key:key.mouse.right> <red>-1s</red>"
   adjust-shift-left: "<key:key.sneak> <dark_gray>+</dark_gray> <key:key.mouse.left> <green>+5s</green>"
   adjust-shift-right: "<key:key.sneak> <dark_gray>+</dark_gray> <key:key.mouse.right> <red>-5s</red>"
-  cooldown-use: "<key:key.mouse.right> <white>{seconds}s</white>  <dark_gray>use</dark_gray>"
-  cooldown-attack: "<key:key.mouse.left> <white>{seconds}s</white>  <dark_gray>attack</dark_gray>"
-  cooldown-lunge: "<key:key.use> <white>{seconds}s</white>  <dark_gray>lunge</dark_gray>"
-  cooldown-off-use: "<key:key.mouse.right> <red>ᴅɪsᴀʙʟᴇᴅ</red>  <dark_gray>use</dark_gray>"
-  cooldown-off-attack: "<key:key.mouse.left> <red>ᴅɪsᴀʙʟᴇᴅ</red>  <dark_gray>attack</dark_gray>"
-  cooldown-off-lunge: "<key:key.use> <red>ᴅɪsᴀʙʟᴇᴅ</red>  <dark_gray>lunge</dark_gray>"
-  cooldown-unset: "<dark_gray>Add an item to show <key:key.mouse.left> or <key:key.mouse.right></dark_gray>"
+  cooldown: "<white>{seconds}s cooldown</white>"
+  cooldown-off: "<red>ᴅɪsᴀʙʟᴇᴅ</red>"
+  kind-use: "<dark_gray>Use</dark_gray>"
+  kind-attack: "<dark_gray>Attack</dark_gray>"
+  kind-lunge: "<dark_gray>Lunge</dark_gray>"
+  cooldown-use: "<white>{seconds}s cooldown</white>"
+  cooldown-attack: "<white>{seconds}s cooldown</white>"
+  cooldown-lunge: "<white>{seconds}s cooldown</white>"
+  cooldown-off-use: "<red>ᴅɪsᴀʙʟᴇᴅ</red>"
+  cooldown-off-attack: "<red>ᴅɪsᴀʙʟᴇᴅ</red>"
+  cooldown-off-lunge: "<red>ᴅɪsᴀʙʟᴇᴅ</red>"
+  cooldown-unset: "<dark_gray>Put an item in the empty slot</dark_gray>"
   match-potion-on: "<white>This potion only"
   match-potion-off: "<gray>Any potion in this bottle"
   match-cmd-on: "<white>This custom model only"
@@ -103,6 +108,7 @@ gui:
     firework: "<white>Firework Rocket"
     golden-apple: "<white>Golden Apple"
     enchanted-apple: "<white>Enchanted Golden Apple"
+    totem: "<white>Totem of Undying"
     turtle: "<white>Turtle Master"
     turtle-lore: "<dark_gray>Drink, splash & lingering</dark_gray>"
     healing: "<white>Instant Health"

@@ -66,6 +66,11 @@ public final class Messages {
     public static final String ITEM_SLOT = "gui.item-slot";
     public static final String ITEM_SLOT_EMPTY = "gui.item-slot-empty";
     public static final String TIME = "gui.time";
+    public static final String COOLDOWN = "gui.cooldown";
+    public static final String COOLDOWN_OFF = "gui.cooldown-off";
+    public static final String KIND_USE = "gui.kind-use";
+    public static final String KIND_ATTACK = "gui.kind-attack";
+    public static final String KIND_LUNGE = "gui.kind-lunge";
     public static final String COOLDOWN_USE = "gui.cooldown-use";
     public static final String COOLDOWN_ATTACK = "gui.cooldown-attack";
     public static final String COOLDOWN_OFF_USE = "gui.cooldown-off-use";
@@ -111,6 +116,7 @@ public final class Messages {
     public static final String PRESET_FIREWORK = "gui.preset-name.firework";
     public static final String PRESET_GOLDEN_APPLE = "gui.preset-name.golden-apple";
     public static final String PRESET_ENCHANTED_APPLE = "gui.preset-name.enchanted-apple";
+    public static final String PRESET_TOTEM = "gui.preset-name.totem";
     public static final String PRESET_TURTLE = "gui.preset-name.turtle";
     public static final String PRESET_TURTLE_LORE = "gui.preset-name.turtle-lore";
     public static final String PRESET_HEALING = "gui.preset-name.healing";

@@ -67,7 +67,7 @@ public final class RuleEditorMenu implements MenuHolder {
     }
 
     private void paint() {
-        GuiItems.frame(inventory, plugin);
+        GuiItems.fill(inventory, GuiItems.filler(plugin));
         inventory.setItem(BOOK, GuiItems.button(
                 plugin,
                 Material.BOOK,
@@ -90,6 +90,9 @@ public final class RuleEditorMenu implements MenuHolder {
         inventory.setItem(ITEM, itemButton());
         inventory.setItem(TIME, timeButton());
         if (grouped()) {
+            inventory.setItem(POTION, GuiItems.filler(plugin));
+            inventory.setItem(CMD, GuiItems.filler(plugin));
+            inventory.setItem(MODEL, GuiItems.filler(plugin));
             return;
         }
         paintMatch(POTION, hasPotion(), matchPotion, Material.POTION, Messages.MATCH_POTION_ON, Messages.MATCH_POTION_OFF);
@@ -120,7 +123,7 @@ public final class RuleEditorMenu implements MenuHolder {
 
     private ItemStack itemButton() {
         if (template == null) {
-            return GuiItems.button(plugin, Material.LIGHT_GRAY_STAINED_GLASS_PANE, Messages.ITEM_SLOT, Messages.ITEM_SLOT_EMPTY);
+            return null;
         }
         Component name = grouped() ? Messages.text(groupNameKey()) : GuiItems.shownName(viewer, template);
         return GuiItems.named(plugin, template, name, List.of(), grouped());
@@ -137,7 +140,7 @@ public final class RuleEditorMenu implements MenuHolder {
 
     private void paintMatch(int slot, boolean available, boolean on, Material material, String onKey, String offKey) {
         if (!available) {
-            inventory.setItem(slot, null);
+            inventory.setItem(slot, GuiItems.filler(plugin));
             return;
         }
         inventory.setItem(slot, GuiItems.button(

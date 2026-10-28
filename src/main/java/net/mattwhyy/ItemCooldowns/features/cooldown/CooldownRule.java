@@ -371,7 +371,8 @@ public final class CooldownRule {
                 || material == Material.EGG
                 || material == Material.SNOWBALL
                 || material == Material.EXPERIENCE_BOTTLE
-                || material == Material.ENDER_EYE;
+                || material == Material.ENDER_EYE
+                || material == Material.TOTEM_OF_UNDYING;
     }
 
     public static boolean leftOnly(Material material) {

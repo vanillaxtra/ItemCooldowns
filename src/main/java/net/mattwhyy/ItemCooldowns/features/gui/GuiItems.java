@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -80,9 +81,8 @@ public final class GuiItems {
             return item;
         }
         meta.displayName(name);
-        if (!lore.isEmpty()) {
-            meta.lore(lore);
-        }
+        meta.lore(lore);
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         if (glint) {
             meta.setEnchantmentGlintOverride(true);
         }
@@ -108,15 +108,18 @@ public final class GuiItems {
     }
 
     public static void addCooldownLore(List<Component> lore, Material material, int seconds) {
-        String key;
-        if (CooldownRule.lungeOnly(material)) {
-            key = seconds <= 0 ? Messages.COOLDOWN_OFF_LUNGE : Messages.COOLDOWN_LUNGE;
-        } else if (CooldownRule.interactable(material)) {
-            key = seconds <= 0 ? Messages.COOLDOWN_OFF_USE : Messages.COOLDOWN_USE;
+        if (seconds <= 0) {
+            lore.add(Messages.text(Messages.COOLDOWN_OFF));
         } else {
-            key = seconds <= 0 ? Messages.COOLDOWN_OFF_ATTACK : Messages.COOLDOWN_ATTACK;
+            lore.add(Messages.text(Messages.COOLDOWN, "seconds", String.valueOf(seconds)));
         }
-        lore.add(Messages.text(key, "seconds", String.valueOf(seconds)));
+        if (CooldownRule.lungeOnly(material)) {
+            lore.add(Messages.text(Messages.KIND_LUNGE));
+        } else if (CooldownRule.interactable(material)) {
+            lore.add(Messages.text(Messages.KIND_USE));
+        } else {
+            lore.add(Messages.text(Messages.KIND_ATTACK));
+        }
     }
 
     public static void fill(Inventory inventory, ItemStack filler) {
