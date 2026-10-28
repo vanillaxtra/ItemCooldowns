@@ -1,5 +1,3 @@
-# MiniMessage works in every line. Gray is the body, white is the emphasis.
-# Green is a success, red is a stop. The plugin does not recolor these.
 version: 8
 
 command:

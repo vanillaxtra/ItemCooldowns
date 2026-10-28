@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
     compileOnly "io.papermc.paper:paper-api:${paperApi}"
+    compileOnly "org.bstats:bstats-bukkit:${bstatsVersion}"
 }
 
 java {
@@ -28,8 +29,9 @@ tasks.withType(JavaCompile).configureEach {
 
 processResources {
     def props = [
-            version   : version,
-            apiVersion: apiVersion
+            version      : version,
+            apiVersion   : apiVersion,
+            bstatsVersion: bstatsVersion
     ]
     inputs.properties props
     filteringCharset 'UTF-8'

@@ -7,6 +7,7 @@ import net.mattwhyy.itemcooldowns.commands.SetCooldownCommand;
 import net.mattwhyy.itemcooldowns.features.cooldown.CooldownRepository;
 import net.mattwhyy.itemcooldowns.features.cooldown.CooldownService;
 import net.mattwhyy.itemcooldowns.features.gui.MenuHolder;
+import net.mattwhyy.itemcooldowns.hooks.ModrinthUpdateChecker;
 import net.mattwhyy.itemcooldowns.listeners.CommandSendListener;
 import net.mattwhyy.itemcooldowns.listeners.EntityShootBowListener;
 import net.mattwhyy.itemcooldowns.listeners.GuiClickListener;
@@ -59,6 +60,16 @@ public final class ItemCooldownsPlugin extends JavaPlugin {
         bind("setcooldown", new SetCooldownCommand(this));
         bind("getcooldown", new GetCooldownCommand(this));
         bind("resetcooldown", new ResetCooldownCommand(this));
+        startMetrics();
+        ModrinthUpdateChecker.start(this);
+    }
+
+    private void startMetrics() {
+        try {
+            new org.bstats.bukkit.Metrics(this, 34985);
+        } catch (NoClassDefFoundError | Exception exception) {
+            getLogger().warning("Could not start bStats: " + exception.getMessage());
+        }
     }
 
     public boolean reloadSettings() {
