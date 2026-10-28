@@ -138,26 +138,16 @@ public final class CooldownRule {
         return material.name().endsWith("_SPEAR");
     }
 
-    public static boolean lungeOnly(Material material) {
-        return spear(material);
-    }
-
     public static boolean interactable(Material material) {
-        return !leftOnly(material) && !lungeOnly(material);
+        return !leftOnly(material);
     }
 
     public static int leftOf(Material material, int seconds) {
-        if (lungeOnly(material) || interactable(material)) {
-            return 0;
-        }
-        return seconds;
+        return interactable(material) ? 0 : seconds;
     }
 
     public static int rightOf(Material material, int seconds) {
-        if (lungeOnly(material) || interactable(material)) {
-            return seconds;
-        }
-        return 0;
+        return interactable(material) ? seconds : 0;
     }
 
     public String id() {
@@ -206,9 +196,6 @@ public final class CooldownRule {
     }
 
     public int seconds() {
-        if (lungeOnly(material) || group == Group.SPEAR) {
-            return rightSeconds > 0 ? rightSeconds : leftSeconds;
-        }
         if (interactable(material)) {
             return rightSeconds > 0 ? rightSeconds : leftSeconds;
         }
@@ -216,9 +203,6 @@ public final class CooldownRule {
     }
 
     public int seconds(ClickSide side) {
-        if (lungeOnly(material) || group == Group.SPEAR) {
-            return side == ClickSide.LUNGE ? seconds() : 0;
-        }
         return side == ClickSide.LEFT ? leftSeconds : rightSeconds;
     }
 

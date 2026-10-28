@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 
 public final class CooldownRepository {
-    public static final int SCHEMA = 5;
+    public static final int SCHEMA = 6;
     private static final long SAVE_DELAY = 40L;
 
     private final ItemCooldownsPlugin plugin;
