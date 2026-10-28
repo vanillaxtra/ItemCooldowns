@@ -68,7 +68,7 @@ public final class RuleListMenu implements MenuHolder {
     }
 
     private void paint() {
-        GuiItems.fill(inventory, GuiItems.filler(plugin));
+        GuiItems.frame(inventory, plugin);
         inventory.setItem(BOOK, GuiItems.button(plugin, Material.BOOK, Messages.HELP_NAME, Messages.LIST_LORE));
         inventory.setItem(PRESETS, GuiItems.button(plugin, Material.CHEST, Messages.PRESETS, Messages.PRESETS_LORE));
         List<CooldownRule> rules = plugin.rules().rules();
@@ -133,9 +133,7 @@ public final class RuleListMenu implements MenuHolder {
         int entry = page * PAGE_SIZE + offset;
         if (entry == rules) {
             ItemStack held = GuiItems.asTemplate(plugin, player.getInventory().getItemInMainHand());
-            CooldownRule draft = held == null
-                    ? null
-                    : CooldownRule.fromItem(held, true, true, true, defaults(held, true), defaults(held, false));
+            CooldownRule draft = held == null ? null : CooldownRule.fromItem(held, true, true, true, 5);
             later(player, () -> RuleEditorMenu.open(plugin, player, -1, draft, true));
             return;
         }
@@ -144,17 +142,6 @@ public final class RuleListMenu implements MenuHolder {
         }
         CooldownRule rule = plugin.rules().get(entry);
         later(player, () -> RuleEditorMenu.open(plugin, player, entry, rule, true));
-    }
-
-    private static int defaults(ItemStack stack, boolean left) {
-        if (stack == null) {
-            return 0;
-        }
-        Material material = stack.getType();
-        if (left) {
-            return CooldownRule.showLeft(material) ? 5 : 0;
-        }
-        return CooldownRule.showRight(material) ? 5 : 0;
     }
 
     private static int indexOf(int slot) {

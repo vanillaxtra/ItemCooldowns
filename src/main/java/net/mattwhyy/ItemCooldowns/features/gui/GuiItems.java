@@ -92,20 +92,15 @@ public final class GuiItems {
     public static ItemStack ruleIcon(ItemCooldownsPlugin plugin, Player player, CooldownRule rule) {
         ItemStack icon = rule.icon();
         List<Component> lore = new ArrayList<>();
-        if (rule.leftSeconds() > 0) {
-            lore.add(Messages.text(Messages.RULE_LEFT, "seconds", seconds(rule.leftSeconds())));
-        }
-        if (rule.rightSeconds() > 0) {
-            lore.add(Messages.text(Messages.RULE_RIGHT, "seconds", seconds(rule.rightSeconds())));
-        }
-        if (rule.grouped()) {
+        addCooldownLore(lore, rule.material(), rule.seconds());
+        if (rule.group().split()) {
             lore.add(Messages.text(
                     Messages.RULE_GROUP_COUNT,
                     "on",
                     String.valueOf(rule.enabled().size()),
                     "total",
                     String.valueOf(CooldownRule.groupKeys(rule.group()).size())));
-        } else if (rule.potion() != null) {
+        } else if (!rule.grouped() && rule.potion() != null) {
             lore.add(Messages.text(Messages.RULE_MATCH_POTION, "value", pretty(rule.potion().name())));
         }
         if (rule.cmd() != null) {
@@ -118,9 +113,45 @@ public final class GuiItems {
         return named(plugin, icon, name, lore, false);
     }
 
+    public static void addCooldownLore(List<Component> lore, Material material, int seconds) {
+        if (seconds <= 0) {
+            lore.add(Messages.text(CooldownRule.interactable(material) ? Messages.COOLDOWN_OFF_USE : Messages.COOLDOWN_OFF_ATTACK));
+            return;
+        }
+        lore.add(Messages.text(
+                CooldownRule.interactable(material) ? Messages.COOLDOWN_USE : Messages.COOLDOWN_ATTACK,
+                "seconds",
+                String.valueOf(seconds)));
+    }
+
     public static void fill(Inventory inventory, ItemStack filler) {
         for (int slot = 0; slot < inventory.getSize(); slot++) {
             inventory.setItem(slot, filler.clone());
+        }
+    }
+
+    public static ItemStack pane(ItemCooldownsPlugin plugin, Material material) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.setHideTooltip(true);
+        return store(plugin, item, meta);
+    }
+
+    public static void frame(Inventory inventory, ItemCooldownsPlugin plugin) {
+        frame(inventory, plugin, Material.GRAY_STAINED_GLASS_PANE);
+    }
+
+    public static void frame(Inventory inventory, ItemCooldownsPlugin plugin, Material pane) {
+        ItemStack border = pane(plugin, pane);
+        int size = inventory.getSize();
+        int rows = size / 9;
+        for (int slot = 0; slot < size; slot++) {
+            int col = slot % 9;
+            int row = slot / 9;
+            if (row != 0 && row != rows - 1 && col != 0 && col != 8) {
+                continue;
+            }
+            inventory.setItem(slot, border.clone());
         }
     }
 

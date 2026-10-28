@@ -42,7 +42,7 @@ public final class PresetMenu implements MenuHolder {
     }
 
     private void paint() {
-        GuiItems.fill(inventory, GuiItems.filler(plugin));
+        GuiItems.frame(inventory, plugin);
         inventory.setItem(BOOK, GuiItems.button(plugin, Material.BOOK, Messages.PRESETS, Messages.PRESETS_LORE));
         inventory.setItem(BACK, GuiItems.button(plugin, Material.ARROW, Messages.BACK));
         refresh();
@@ -60,21 +60,11 @@ public final class PresetMenu implements MenuHolder {
         CooldownRule rule = preset.rule();
         boolean on = rule != null && plugin.rules().enabled(rule);
         List<Component> lore = new ArrayList<>();
-        lore.add(on ? timeLine(preset) : Messages.text(Messages.SECONDS_OFF));
+        GuiItems.addCooldownLore(lore, preset.icon().getType(), preset.seconds());
         if (preset.extraLoreKey() != null) {
             lore.add(Messages.text(preset.extraLoreKey()));
         }
         return GuiItems.named(plugin, preset.icon(), Messages.text(preset.nameKey()), lore, on);
-    }
-
-    static Component timeLine(CooldownPresets.Preset preset) {
-        if (preset.left() > 0 && preset.right() > 0) {
-            return Messages.text(Messages.PRESET_TIME_BOTH, "seconds", String.valueOf(preset.left()));
-        }
-        if (preset.left() > 0) {
-            return Messages.text(Messages.PRESET_TIME_LEFT, "seconds", String.valueOf(preset.left()));
-        }
-        return Messages.text(Messages.PRESET_TIME_RIGHT, "seconds", String.valueOf(preset.right()));
     }
 
     @Override
@@ -101,13 +91,14 @@ public final class PresetMenu implements MenuHolder {
         if (rule == null) {
             return;
         }
-        boolean on = plugin.rules().toggle(rule);
-        refresh();
-        if (on) {
-            MenuSounds.toggleOn(player);
-        } else {
-            MenuSounds.toggleOff(player);
+        int existing = plugin.rules().indexOf(rule);
+        if (existing < 0) {
+            plugin.rules().add(rule);
+            existing = plugin.rules().indexOf(rule);
         }
+        int indexToOpen = existing;
+        CooldownRule stored = plugin.rules().get(indexToOpen);
+        later(player, () -> RuleEditorMenu.open(plugin, player, indexToOpen, stored, true));
     }
 
     private void later(Player player, Runnable action) {

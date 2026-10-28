@@ -20,7 +20,15 @@ public final class CooldownRule {
         NONE,
         SPEAR,
         TURTLE_MASTER,
-        INSTANT_HEALTH
+        INSTANT_HEALTH;
+
+        public boolean split() {
+            return this == SPEAR;
+        }
+
+        public boolean locked() {
+            return this == TURTLE_MASTER || this == INSTANT_HEALTH;
+        }
     }
 
     private static final List<String> SPEAR_KEYS = List.of(
@@ -75,7 +83,9 @@ public final class CooldownRule {
         this.leftSeconds = Math.max(0, leftSeconds);
         this.rightSeconds = Math.max(0, rightSeconds);
         this.group = group == null ? Group.NONE : group;
-        this.enabled = this.group == Group.NONE ? Set.of() : Set.copyOf(enabled);
+        this.enabled = this.group == Group.NONE
+                ? Set.of()
+                : this.group.locked() ? Set.copyOf(groupKeys(this.group)) : Set.copyOf(enabled);
     }
 
     public static CooldownRule fromItem(
@@ -83,8 +93,7 @@ public final class CooldownRule {
             boolean matchPotion,
             boolean matchCmd,
             boolean matchModel,
-            int leftSeconds,
-            int rightSeconds) {
+            int seconds) {
         ItemFingerprint print = ItemFingerprint.of(stack);
         if (print == null) {
             return null;
@@ -95,21 +104,34 @@ public final class CooldownRule {
                 matchPotion ? print.potion() : null,
                 matchCmd ? print.cmd() : null,
                 matchModel ? print.itemModel() : null,
-                leftSeconds,
-                rightSeconds);
+                leftOf(print.material(), seconds),
+                rightOf(print.material(), seconds));
     }
 
-    public static CooldownRule group(Group group, int leftSeconds, int rightSeconds) {
+    public static CooldownRule group(Group group, int seconds) {
+        Material icon = groupIcon(group);
         return new CooldownRule(
                 null,
-                groupIcon(group),
+                icon,
                 groupPotion(group),
                 null,
                 null,
-                leftSeconds,
-                rightSeconds,
+                leftOf(icon, seconds),
+                rightOf(icon, seconds),
                 group,
                 new LinkedHashSet<>(groupKeys(group)));
+    }
+
+    public static boolean interactable(Material material) {
+        return !leftOnly(material);
+    }
+
+    public static int leftOf(Material material, int seconds) {
+        return interactable(material) ? 0 : seconds;
+    }
+
+    public static int rightOf(Material material, int seconds) {
+        return interactable(material) ? seconds : 0;
     }
 
     public String id() {
@@ -148,8 +170,29 @@ public final class CooldownRule {
         return enabled;
     }
 
+    public int seconds() {
+        if (interactable(material)) {
+            return rightSeconds > 0 ? rightSeconds : leftSeconds;
+        }
+        return leftSeconds > 0 ? leftSeconds : rightSeconds;
+    }
+
     public int seconds(ClickSide side) {
         return side == ClickSide.LEFT ? leftSeconds : rightSeconds;
+    }
+
+    public CooldownRule normalized() {
+        int value = seconds();
+        return new CooldownRule(
+                id,
+                material,
+                potion,
+                cmd,
+                itemModel,
+                leftOf(material, value),
+                rightOf(material, value),
+                group,
+                enabled);
     }
 
     public boolean grouped() {

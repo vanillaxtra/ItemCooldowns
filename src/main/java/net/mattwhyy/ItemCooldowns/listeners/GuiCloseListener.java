@@ -24,6 +24,7 @@ public final class GuiCloseListener implements Listener {
         if (!(event.getInventory().getHolder() instanceof MenuHolder holder)) {
             return;
         }
+        holder.onClose(player);
         GuiItems.strip(plugin, player);
         if (holder.consumeSilent()) {
             return;

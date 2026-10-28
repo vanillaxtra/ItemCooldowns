@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 
 public final class CooldownRepository {
-    public static final int SCHEMA = 3;
+    public static final int SCHEMA = 4;
     private static final long SAVE_DELAY = 40L;
 
     private final ItemCooldownsPlugin plugin;
@@ -97,7 +97,7 @@ public final class CooldownRepository {
     }
 
     public boolean enabled(ItemStack stack) {
-        CooldownRule rule = CooldownRule.fromItem(stack, true, false, false, 0, 0);
+        CooldownRule rule = CooldownRule.fromItem(stack, true, false, false, 0);
         return rule != null && indexOf(rule) >= 0;
     }
 
@@ -115,8 +115,8 @@ public final class CooldownRepository {
         return true;
     }
 
-    public boolean toggle(ItemStack stack, int left, int right) {
-        CooldownRule rule = CooldownRule.fromItem(stack, true, false, false, left, right);
+    public boolean toggle(ItemStack stack, int seconds) {
+        CooldownRule rule = CooldownRule.fromItem(stack, true, false, false, seconds);
         if (rule == null) {
             return false;
         }
@@ -184,6 +184,11 @@ public final class CooldownRepository {
                     group,
                     enabled));
         }
+        boolean stale = config.getInt("schema") < SCHEMA;
+        if (stale) {
+            rules.replaceAll(CooldownRule::normalized);
+            saveNow();
+        }
         return true;
     }
 
@@ -225,7 +230,6 @@ public final class CooldownRepository {
         }
         ConfigurationSection old = config.getConfigurationSection("cooldowns");
         if (old == null) {
-            config.set("schema", SCHEMA);
             return;
         }
         List<CooldownRule> migrated = new ArrayList<>();
@@ -236,22 +240,19 @@ public final class CooldownRepository {
                 continue;
             }
             int seconds = Math.max(0, old.getInt(key));
-            int left = 0;
-            int right = 0;
-            if (CooldownRule.bothDefault(material)) {
-                left = seconds;
-                right = seconds;
-            } else if (CooldownRule.meleeDefault(material)) {
-                left = seconds;
-            } else {
-                right = seconds;
-            }
-            migrated.add(new CooldownRule(null, material, null, null, null, left, right));
+            migrated.add(new CooldownRule(
+                    null,
+                    material,
+                    null,
+                    null,
+                    null,
+                    CooldownRule.leftOf(material, seconds),
+                    CooldownRule.rightOf(material, seconds)));
         }
         rules.clear();
         rules.addAll(migrated);
         config.set("schema", SCHEMA);
         saveNow();
-        plugin.getLogger().info("Migrated old material cooldowns to left/right rules");
+        plugin.getLogger().info("Migrated old material cooldowns");
     }
 }

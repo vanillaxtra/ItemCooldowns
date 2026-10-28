@@ -41,22 +41,25 @@ public final class SetCooldownCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(Messages.text(Messages.BAD_ITEM));
             return true;
         }
-        int left = 0;
-        int right = 0;
-        if (CooldownRule.bothDefault(material)) {
-            left = seconds;
-            right = seconds;
-        } else if (CooldownRule.meleeDefault(material)) {
-            left = seconds;
-        } else {
-            right = seconds;
-        }
-        CooldownRule rule = new CooldownRule(null, material, null, null, null, left, right);
+        CooldownRule rule = new CooldownRule(
+                null,
+                material,
+                null,
+                null,
+                null,
+                CooldownRule.leftOf(material, seconds),
+                CooldownRule.rightOf(material, seconds));
         int existing = plugin.rules().indexOfFilter(rule.filter());
         if (existing >= 0) {
             CooldownRule old = plugin.rules().get(existing);
             plugin.rules().replace(existing, new CooldownRule(
-                    old.id(), material, null, null, null, left, right));
+                    old.id(),
+                    material,
+                    null,
+                    null,
+                    null,
+                    CooldownRule.leftOf(material, seconds),
+                    CooldownRule.rightOf(material, seconds)));
         } else {
             plugin.rules().add(rule);
         }

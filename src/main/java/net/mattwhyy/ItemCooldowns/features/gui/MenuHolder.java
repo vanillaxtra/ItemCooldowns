@@ -28,6 +28,9 @@ public interface MenuHolder extends InventoryHolder {
         event.setCancelled(false);
     }
 
+    default void onClose(Player player) {
+    }
+
     void markSilent();
 
     boolean consumeSilent();

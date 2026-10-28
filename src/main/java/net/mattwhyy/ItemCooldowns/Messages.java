@@ -59,6 +59,13 @@ public final class Messages {
     public static final String RULE_GROUP_COUNT = "gui.rule-group-count";
     public static final String ITEM_SLOT = "gui.item-slot";
     public static final String ITEM_SLOT_EMPTY = "gui.item-slot-empty";
+    public static final String TIME = "gui.time";
+    public static final String COOLDOWN_USE = "gui.cooldown-use";
+    public static final String COOLDOWN_ATTACK = "gui.cooldown-attack";
+    public static final String COOLDOWN_OFF_USE = "gui.cooldown-off-use";
+    public static final String COOLDOWN_OFF_ATTACK = "gui.cooldown-off-attack";
+    public static final String COOLDOWN_UNSET = "gui.cooldown-unset";
+    public static final String DROP_HINT = "gui.drop-hint";
     public static final String LEFT = "gui.left";
     public static final String RIGHT = "gui.right";
     public static final String SECONDS_OFF = "gui.seconds-off";
@@ -70,6 +77,7 @@ public final class Messages {
     public static final String MATCH_CMD_OFF = "gui.match-cmd-off";
     public static final String MATCH_MODEL_ON = "gui.match-model-on";
     public static final String MATCH_MODEL_OFF = "gui.match-model-off";
+    public static final String RULE_TIME = "gui.rule-time";
     public static final String RULE_LEFT = "gui.rule-left";
     public static final String RULE_RIGHT = "gui.rule-right";
     public static final String RULE_MATCH_ALL = "gui.rule-match-all";
@@ -77,6 +85,7 @@ public final class Messages {
     public static final String RULE_MATCH_CMD = "gui.rule-match-cmd";
     public static final String RULE_MATCH_MODEL = "gui.rule-match-model";
     public static final String PRESET_LORE = "gui.preset-lore";
+    public static final String PRESET_TIME = "gui.preset-time";
     public static final String PRESET_TIME_RIGHT = "gui.preset-time-right";
     public static final String PRESET_TIME_LEFT = "gui.preset-time-left";
     public static final String PRESET_TIME_BOTH = "gui.preset-time-both";

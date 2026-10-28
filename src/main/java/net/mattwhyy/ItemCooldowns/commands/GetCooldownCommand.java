@@ -47,8 +47,7 @@ public final class GetCooldownCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(Messages.text(
                 Messages.GET_OK,
                 "item", material.name().toLowerCase(Locale.ROOT),
-                "left", String.valueOf(found.leftSeconds()),
-                "right", String.valueOf(found.rightSeconds())));
+                "seconds", String.valueOf(found.seconds())));
         return true;
     }
 
