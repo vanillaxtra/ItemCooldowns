@@ -42,24 +42,54 @@ public final class CooldownService {
         }
         long until = System.currentTimeMillis() + seconds * 1000L;
         readyAt.computeIfAbsent(player.getUniqueId(), ignored -> new HashMap<>()).put(key(rule, side), until);
-        boolean vanilla = !rule.specific() && oneSided(rule);
+        int ticks = seconds * 20;
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             if (!player.isOnline()) {
                 return;
             }
-            if (rule.group() == CooldownRule.Group.SPEAR) {
-                for (String key : rule.enabled()) {
-                    Material material = CooldownRule.materialOf(key);
-                    if (material != null) {
-                        player.setCooldown(material, seconds * 20);
-                    }
-                }
-                return;
-            }
-            if (vanilla) {
-                player.setCooldown(rule.material(), seconds * 20);
-            }
+            applyItemCooldown(player, rule, stack, ticks);
         });
+    }
+
+    private void applyItemCooldown(Player player, CooldownRule rule, ItemStack stack, int ticks) {
+        if (rule.group() == CooldownRule.Group.SPEAR) {
+            for (String key : rule.enabled()) {
+                Material material = CooldownRule.materialOf(key);
+                if (material != null) {
+                    player.setCooldown(material, ticks);
+                }
+            }
+            return;
+        }
+        if (rule.group() == CooldownRule.Group.TURTLE_MASTER || rule.group() == CooldownRule.Group.INSTANT_HEALTH) {
+            for (String key : rule.enabled()) {
+                ItemStack icon = CooldownRule.optionIcon(key);
+                if (icon != null) {
+                    player.setCooldown(icon, ticks);
+                }
+            }
+            return;
+        }
+        if (stack != null && !stack.getType().isAir() && stackCooldown(rule, stack)) {
+            player.setCooldown(stack, ticks);
+            return;
+        }
+        if (!rule.specific() && oneSided(rule)) {
+            player.setCooldown(rule.material(), ticks);
+        }
+    }
+
+    private static boolean stackCooldown(CooldownRule rule, ItemStack stack) {
+        if (rule.potion() != null || rule.cmd() != null || rule.itemModel() != null) {
+            return true;
+        }
+        return potionItem(stack.getType());
+    }
+
+    private static boolean potionItem(Material material) {
+        return material == Material.POTION
+                || material == Material.SPLASH_POTION
+                || material == Material.LINGERING_POTION;
     }
 
     public boolean use(Player player, ItemStack stack, ClickSide side) {
