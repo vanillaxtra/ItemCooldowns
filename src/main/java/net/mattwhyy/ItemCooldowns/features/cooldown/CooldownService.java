@@ -18,6 +18,14 @@ public final class CooldownService {
         this.plugin = plugin;
     }
 
+    public boolean ready(Player player, ItemStack stack, ClickSide side) {
+        CooldownRule rule = plugin.rules().best(stack);
+        if (rule == null || rule.seconds(side) <= 0) {
+            return true;
+        }
+        return remainingMillis(player, rule, side) <= 0;
+    }
+
     public boolean allow(Player player, ItemStack stack, ClickSide side) {
         CooldownRule rule = plugin.rules().best(stack);
         if (rule == null || rule.seconds(side) <= 0) {

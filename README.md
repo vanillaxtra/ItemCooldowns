@@ -1,6 +1,6 @@
 # ItemCooldowns
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0.2-blue.svg)
 ![Platform](https://img.shields.io/badge/Paper-1.21.11-purple.svg)
 ![Modrinth](https://img.shields.io/modrinth/dt/itemcooldowns?style=flat&logo=modrinth&label=Downloads&color=00AF5C)
 

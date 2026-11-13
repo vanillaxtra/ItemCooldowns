@@ -34,3 +34,6 @@ permissions:
   itemcooldowns.get:
     description: Allows checking an item's cooldown
     default: op
+  itemcooldowns.update.notify:
+    description: Get notified in chat when a plugin update is available
+    default: op

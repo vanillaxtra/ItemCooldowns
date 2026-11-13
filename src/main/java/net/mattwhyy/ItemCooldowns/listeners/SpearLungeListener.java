@@ -80,9 +80,7 @@ public final class SpearLungeListener implements Listener {
         }
         ItemStack from = player.getInventory().getItem(event.getPreviousSlot());
         ItemStack to = player.getInventory().getItem(event.getNewSlot());
-        if (guarded(from) || guarded(to)) {
-            markSwap(player);
-        }
+        markSwap(player, from, to);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -92,9 +90,7 @@ public final class SpearLungeListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        if (guarded(event.getMainHandItem()) || guarded(event.getOffHandItem())) {
-            markSwap(player);
-        }
+        markSwap(player, event.getMainHandItem(), event.getOffHandItem());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -115,8 +111,8 @@ public final class SpearLungeListener implements Listener {
                 return;
             }
             ItemStack after = player.getInventory().getItemInMainHand();
-            if ((guarded(before) || guarded(after)) && !same(before, after)) {
-                markSwap(player);
+            if (!same(before, after)) {
+                markSwap(player, before, after);
             }
         });
     }
@@ -128,9 +124,7 @@ public final class SpearLungeListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        if (guarded(event.getItemDrop().getItemStack())) {
-            markSwap(player);
-        }
+        markSwap(player, event.getItemDrop().getItemStack());
     }
 
     @EventHandler
@@ -156,14 +150,16 @@ public final class SpearLungeListener implements Listener {
     }
 
     private boolean lungeAttempt(Player player, ItemStack stack) {
-        if (stack == null || !CooldownRule.spear(stack.getType()) || !hasLunge(stack)) {
-            return false;
-        }
-        return player.getAttackCooldown() >= 0.95f;
+        return stack != null && CooldownRule.spear(stack.getType()) && hasLunge(stack);
     }
 
-    private void markSwap(Player player) {
-        player.resetCooldown();
+    private void markSwap(Player player, ItemStack... stacks) {
+        for (ItemStack stack : stacks) {
+            if (guarded(stack) && !plugin.cooldowns().ready(player, stack, ClickSide.LUNGE)) {
+                player.resetCooldown();
+                return;
+            }
+        }
     }
 
     private void lockSwap(Player player) {

@@ -7,7 +7,6 @@ import net.mattwhyy.itemcooldowns.commands.SetCooldownCommand;
 import net.mattwhyy.itemcooldowns.features.cooldown.CooldownRepository;
 import net.mattwhyy.itemcooldowns.features.cooldown.CooldownService;
 import net.mattwhyy.itemcooldowns.features.gui.MenuHolder;
-import net.mattwhyy.itemcooldowns.hooks.ModrinthUpdateChecker;
 import net.mattwhyy.itemcooldowns.listeners.CommandSendListener;
 import net.mattwhyy.itemcooldowns.listeners.EntityShootBowListener;
 import net.mattwhyy.itemcooldowns.listeners.GuiClickListener;
@@ -24,6 +23,7 @@ import net.mattwhyy.itemcooldowns.listeners.PlayerRiptideListener;
 import net.mattwhyy.itemcooldowns.listeners.ShieldBlockListener;
 import net.mattwhyy.itemcooldowns.listeners.SpearLungeListener;
 import net.mattwhyy.itemcooldowns.listeners.TotemResurrectListener;
+import net.mattwhyy.itemcooldowns.updates.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -63,7 +63,7 @@ public final class ItemCooldownsPlugin extends JavaPlugin {
         bind("getcooldown", new GetCooldownCommand(this));
         bind("resetcooldown", new ResetCooldownCommand(this));
         startMetrics();
-        ModrinthUpdateChecker.start(this);
+        new UpdateChecker(this);
     }
 
     private void startMetrics() {
