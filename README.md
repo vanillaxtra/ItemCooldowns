@@ -118,6 +118,6 @@ Rules are saved from the GUI; you can also edit YAML by hand. Use `/itemcooldown
 
 ## Statistics
 
-[![bStats: servers using InstantBrew](https://bstats.org/signatures/bukkit/itemcooldown3.svg)](https://bstats.org/plugin/bukkit/itemcooldown3/34985)
+[![bStats: servers using InstantBrew](https://bstats.org/signatures/bukkit/itemcooldown3.svg)](https://bstats.org/plugin/bukkit/itemcooldown3/35441)
 
 ---
